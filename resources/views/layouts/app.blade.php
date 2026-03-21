@@ -7,6 +7,18 @@
     <title>@yield('title', 'PFA Expenses')</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.ico">
+
+    {{-- PWA: add to home screen --}}
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    {{-- iOS Safari specific --}}
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PFA Expenses">
+    <link rel="apple-touch-icon" href="/pwa-icon-512.svg">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* ── CSS Variables — dark (default) ─────────────── */

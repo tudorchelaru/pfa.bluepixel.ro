@@ -6,6 +6,15 @@
     <title>Login - PFA Expenses</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="shortcut icon" href="/favicon.ico">
+
+    {{-- PWA --}}
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PFA Expenses">
+    <link rel="apple-touch-icon" href="/pwa-icon-512.svg">
+
     <style>
         :root, [data-theme="dark"] {
             --bg:           #0f172a;
