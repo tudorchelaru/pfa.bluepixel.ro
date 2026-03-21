@@ -9,7 +9,7 @@ class RegistruEntry extends Model
     protected $table = 'registru_entries';
 
     protected $fillable = [
-        'user_id', 'data', 'tip', 'metoda', 'suma',
+        'user_id', 'firma_id', 'data', 'tip', 'metoda', 'suma',
         'valuta', 'document', 'deductibilitate', 'tip_cheltuiala',
         'bon_imagine', 'bon_mime',
     ];
@@ -26,5 +26,10 @@ class RegistruEntry extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function firma()
+    {
+        return $this->belongsTo(\App\Models\Firma::class);
     }
 }

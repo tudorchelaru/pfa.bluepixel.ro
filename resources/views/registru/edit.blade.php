@@ -15,6 +15,24 @@
             @csrf
             @method('PUT')
 
+            {{-- Firma --}}
+            @if($firme->isNotEmpty())
+            <div class="mb-3">
+                <label class="form-label">Firma</label>
+                <select name="firma_id" class="form-select" {{ $firme->count() === 1 ? 'disabled' : '' }}>
+                    <option value="">— fără firmă —</option>
+                    @foreach($firme as $f)
+                    <option value="{{ $f->id }}" {{ old('firma_id', $entry->firma_id) == $f->id ? 'selected' : '' }}>
+                        {{ $f->nume }}{{ $f->cui ? ' — CUI '.$f->cui : '' }}
+                    </option>
+                    @endforeach
+                </select>
+                @if($firme->count() === 1)
+                <input type="hidden" name="firma_id" value="{{ $firme->first()->id }}">
+                @endif
+            </div>
+            @endif
+
             <div class="mb-3">
                 <label class="form-label">Data</label>
                 <input type="date" class="form-control" name="data"

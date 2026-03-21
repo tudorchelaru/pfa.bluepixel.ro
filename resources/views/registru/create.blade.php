@@ -18,6 +18,32 @@
         <form method="POST" action="{{ route('registru.store') }}" enctype="multipart/form-data">
             @csrf
 
+            {{-- Firma --}}
+            @if($firme->isNotEmpty())
+            <div class="mb-3">
+                <label class="form-label">Firma</label>
+                @php $firmaDefault = $firme->firstWhere('is_default', true) ?? $firme->first(); @endphp
+                <select name="firma_id" class="form-select" {{ $firme->count() === 1 ? 'disabled' : '' }}>
+                    @foreach($firme as $f)
+                    <option value="{{ $f->id }}" {{ old('firma_id', $firmaDefault->id) == $f->id ? 'selected' : '' }}>
+                        {{ $f->nume }}{{ $f->cui ? ' — CUI '.$f->cui : '' }}
+                    </option>
+                    @endforeach
+                </select>
+                @if($firme->count() === 1)
+                <input type="hidden" name="firma_id" value="{{ $firmaDefault->id }}">
+                @endif
+            </div>
+            @else
+            <div class="mb-3">
+                <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);
+                            border-radius:10px;padding:0.75rem 1rem;font-size:0.9rem;color:var(--text-muted);">
+                    Nu ai nicio firmă configurată.
+                    <a href="{{ route('account.index') }}" style="color:var(--accent);">Adaugă una din Contul meu</a>.
+                </div>
+            </div>
+            @endif
+
             <div class="mb-3">
                 <label class="form-label">Data</label>
                 <input type="date" class="form-control" name="data"

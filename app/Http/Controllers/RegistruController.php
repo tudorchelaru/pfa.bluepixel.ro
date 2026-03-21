@@ -10,12 +10,14 @@ class RegistruController extends Controller
 {
     public function create()
     {
-        return view('registru.create');
+        $firme = Auth::user()->firme()->orderByDesc('is_default')->orderBy('nume')->get();
+        return view('registru.create', compact('firme'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'firma_id'       => 'nullable|exists:firme,id',
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
@@ -132,7 +134,9 @@ class RegistruController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        return view('registru.edit', compact('entry'));
+        $firme = Auth::user()->firme()->orderByDesc('is_default')->orderBy('nume')->get();
+
+        return view('registru.edit', compact('entry', 'firme'));
     }
 
     public function update(Request $request, $id)
@@ -142,6 +146,7 @@ class RegistruController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
+            'firma_id'       => 'nullable|exists:firme,id',
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
