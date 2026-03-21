@@ -411,29 +411,42 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0.75rem;
+            padding: 0.6rem 1rem;
             margin-bottom: 0.5rem;
-            background: rgba(255,255,255,0.08);
-            border-left: 3px solid rgba(102,126,234,0.8);
-            border-radius: 0 8px 8px 0;
+            background: rgba(30,15,60,0.7);
+            border: 1px solid rgba(102,126,234,0.4);
+            border-left: 4px solid rgba(102,126,234,1);
+            border-radius: 8px;
         }
 
         .luna-titlu {
             font-size: 1rem;
             font-weight: 700;
             color: #fff;
-            letter-spacing: 0.02em;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
         .luna-sumar {
             display: flex;
             gap: 0.75rem;
-            font-size: 0.82rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 700;
         }
 
-        .sumar-inc-sm { color: rgba(80,220,120,0.9); }
-        .sumar-pla-sm { color: rgba(255,100,100,0.9); }
+        .sumar-inc-sm {
+            color: #5dde8a;
+            background: rgba(40,167,69,0.15);
+            padding: 0.15rem 0.5rem;
+            border-radius: 5px;
+        }
+        .sumar-pla-sm {
+            color: #ff7a7a;
+            background: rgba(220,53,69,0.15);
+            padding: 0.15rem 0.5rem;
+            border-radius: 5px;
+        }
 
         /* Badge atasament inline */
         .atas-badge {
