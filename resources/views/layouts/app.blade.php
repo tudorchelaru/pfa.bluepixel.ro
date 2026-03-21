@@ -404,6 +404,37 @@
             border-top: 1px solid rgba(255,255,255,0.08);
         }
 
+        /* Grupare pe luni */
+        .luna-section { margin-bottom: 2rem; }
+
+        .luna-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255,255,255,0.08);
+            border-left: 3px solid rgba(102,126,234,0.8);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .luna-titlu {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+
+        .luna-sumar {
+            display: flex;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .sumar-inc-sm { color: rgba(80,220,120,0.9); }
+        .sumar-pla-sm { color: rgba(255,100,100,0.9); }
+
         /* Badge atasament inline */
         .atas-badge {
             display: inline-flex;

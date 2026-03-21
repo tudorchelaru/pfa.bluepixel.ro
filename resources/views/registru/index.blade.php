@@ -28,30 +28,91 @@
             <span class="sumar-sold">Sold: <strong>{{ number_format($sold, 2, ',', '.') }} RON</strong></span>
         </div>
 
-        {{-- Tabel desktop --}}
-        <div class="d-none d-md-block table-responsive">
-            <table class="table table-borderless table-sm registru-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Data</th>
-                        <th>Tip</th>
-                        <th>Metoda</th>
-                        <th>Document</th>
-                        <th>Suma</th>
-                        <th>Ded.</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($entries as $entry)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $entry->data->format('d.m.Y') }}</td>
-                        <td><span class="badge-{{ $entry->tip }}">{{ ucfirst($entry->tip) }}</span></td>
-                        <td>{{ ucfirst($entry->metoda) }}</td>
-                        <td class="col-doc">
-                            <span>{{ $entry->document }}</span>
+        @php
+            $luniRo = ['','Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+            $grouped = $entries->groupBy(fn($e) => $e->data->format('Y-m'));
+        @endphp
+
+        @foreach($grouped as $luna => $lunaEntries)
+            @php
+                [$an, $luna_nr] = explode('-', $luna);
+                $titlu = $luniRo[(int)$luna_nr] . ' ' . $an;
+                $incLuna = $lunaEntries->where('tip', 'incasare')->sum('suma');
+                $plaLuna = $lunaEntries->where('tip', 'plata')->sum('suma');
+            @endphp
+
+            <div class="luna-section">
+                <div class="luna-header">
+                    <span class="luna-titlu">{{ $titlu }}</span>
+                    <div class="luna-sumar">
+                        <span class="sumar-inc-sm">+{{ number_format($incLuna, 2, ',', '.') }}</span>
+                        <span class="sumar-pla-sm">-{{ number_format($plaLuna, 2, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                {{-- Tabel desktop --}}
+                <div class="d-none d-md-block table-responsive">
+                    <table class="table table-borderless table-sm registru-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Data</th>
+                                <th>Tip</th>
+                                <th>Metoda</th>
+                                <th>Document</th>
+                                <th>Suma</th>
+                                <th>Ded.</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lunaEntries as $i => $entry)
+                            <tr>
+                                <td>{{ $i + 1 }}</td>
+                                <td>{{ $entry->data->format('d.m.Y') }}</td>
+                                <td><span class="badge-{{ $entry->tip }}">{{ ucfirst($entry->tip) }}</span></td>
+                                <td>{{ ucfirst($entry->metoda) }}</td>
+                                <td class="col-doc">
+                                    <span>{{ $entry->document }}</span>
+                                    @if($entry->bon_imagine)
+                                        <button type="button" class="atas-badge btn-bon-preview"
+                                            data-url="{{ route('registru.bon', $entry->id) }}"
+                                            data-mime="{{ $entry->bon_mime ?? 'image/jpeg' }}">
+                                            {{ $entry->bon_mime === 'application/pdf' ? 'PDF' : '📎' }}
+                                        </button>
+                                    @endif
+                                </td>
+                                <td class="col-suma">{{ number_format($entry->suma, 2, ',', '.') }} RON</td>
+                                <td>{{ $entry->deductibilitate }}%</td>
+                                <td class="col-actiuni">
+                                    <a href="{{ route('registru.edit', $entry->id) }}" class="btn-tbl btn-tbl-yellow">✎</a>
+                                    <form method="POST" action="{{ route('registru.destroy', $entry->id) }}" class="d-inline"
+                                        onsubmit="return confirm('Stergi aceasta inregistrare?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-tbl btn-tbl-red">✕</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Carduri mobile --}}
+                <div class="d-md-none entry-cards">
+                    @foreach($lunaEntries as $entry)
+                    <div class="entry-card">
+                        <div class="entry-card-top">
+                            <div class="entry-card-left">
+                                <span class="badge-{{ $entry->tip }}">{{ ucfirst($entry->tip) }}</span>
+                                <span class="entry-card-data">{{ $entry->data->format('d.m.Y') }}</span>
+                                <span class="entry-card-metoda">{{ ucfirst($entry->metoda) }}</span>
+                            </div>
+                            <div class="entry-card-suma">{{ number_format($entry->suma, 2, ',', '.') }} RON</div>
+                        </div>
+                        <div class="entry-card-doc">
+                            {{ $entry->document }}
                             @if($entry->bon_imagine)
                                 <button type="button" class="atas-badge btn-bon-preview"
                                     data-url="{{ route('registru.bon', $entry->id) }}"
@@ -59,60 +120,21 @@
                                     {{ $entry->bon_mime === 'application/pdf' ? 'PDF' : '📎' }}
                                 </button>
                             @endif
-                        </td>
-                        <td class="col-suma">{{ number_format($entry->suma, 2, ',', '.') }} RON</td>
-                        <td>{{ $entry->deductibilitate }}%</td>
-                        <td class="col-actiuni">
-                            <a href="{{ route('registru.edit', $entry->id) }}" class="btn-tbl btn-tbl-yellow">✎</a>
-                            <form method="POST" action="{{ route('registru.destroy', $entry->id) }}" class="d-inline"
-                                onsubmit="return confirm('Stergi aceasta inregistrare?')">
+                        </div>
+                        <div class="entry-card-actions">
+                            <a href="{{ route('registru.edit', $entry->id) }}" class="card-btn card-btn-yellow">Editeaza</a>
+                            <form method="POST" action="{{ route('registru.destroy', $entry->id) }}"
+                                onsubmit="return confirm('Stergi aceasta inregistrare?')" style="margin-left:auto;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-tbl btn-tbl-red">✕</button>
+                                <button type="submit" class="card-btn card-btn-red">Sterge</button>
                             </form>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Carduri mobile --}}
-        <div class="d-md-none entry-cards">
-            @foreach($entries as $entry)
-            <div class="entry-card">
-                <div class="entry-card-top">
-                    <div class="entry-card-left">
-                        <span class="badge-{{ $entry->tip }}">{{ ucfirst($entry->tip) }}</span>
-                        <span class="entry-card-data">{{ $entry->data->format('d.m.Y') }}</span>
-                        <span class="entry-card-metoda">{{ ucfirst($entry->metoda) }}</span>
-                    </div>
-                    <div class="entry-card-suma">
-                        {{ number_format($entry->suma, 2, ',', '.') }} RON
-                    </div>
-                </div>
-                <div class="entry-card-doc">
-                    {{ $entry->document }}
-                    @if($entry->bon_imagine)
-                        <button type="button" class="atas-badge btn-bon-preview"
-                            data-url="{{ route('registru.bon', $entry->id) }}"
-                            data-mime="{{ $entry->bon_mime ?? 'image/jpeg' }}">
-                            {{ $entry->bon_mime === 'application/pdf' ? 'PDF' : '📎' }}
-                        </button>
-                    @endif
-                </div>
-                <div class="entry-card-actions">
-                    <a href="{{ route('registru.edit', $entry->id) }}" class="card-btn card-btn-yellow">Editeaza</a>
-                    <form method="POST" action="{{ route('registru.destroy', $entry->id) }}"
-                        onsubmit="return confirm('Stergi aceasta inregistrare?')" style="margin-left:auto;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="card-btn card-btn-red">Sterge</button>
-                    </form>
                 </div>
             </div>
-            @endforeach
-        </div>
+        @endforeach
     @endif
 </div>
 
