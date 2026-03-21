@@ -220,6 +220,7 @@
         <a href="{{ route('registre.index') }}">Registre</a>
         <a href="{{ route('pdf.index') }}">Genereaza PDF</a>
         <span class="user-info">| {{ Auth::user()->username }}</span>
+        <a href="{{ route('profile.change-password') }}" style="color:rgba(255,255,255,0.85);text-decoration:none;padding:0.4rem 1rem;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);font-size:0.9rem;">Schimba parola</a>
         <form method="POST" action="{{ route('logout') }}" class="d-inline">
             @csrf
             <button type="submit" class="nav-links btn-logout" style="border:none;cursor:pointer;background:rgba(220,53,69,0.3);border:1px solid rgba(220,53,69,0.5);color:rgba(255,255,255,0.85);padding:0.4rem 1rem;border-radius:8px;">Logout</button>

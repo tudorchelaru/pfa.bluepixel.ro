@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PDFController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistreController;
 use App\Http\Controllers\RegistruController;
 use Illuminate\Support\Facades\Route;
@@ -32,4 +33,8 @@ Route::middleware('auth')->group(function () {
     // PDF
     Route::get('/genereaza-registre', [PDFController::class, 'index'])->name('pdf.index');
     Route::get('/genereaza-registre/{userId}/{year}', [PDFController::class, 'generate'])->name('pdf.generate');
+
+    // Profile
+    Route::get('/schimba-parola', [ProfileController::class, 'showChangePassword'])->name('profile.change-password');
+    Route::post('/schimba-parola', [ProfileController::class, 'changePassword'])->name('profile.change-password.post');
 });
