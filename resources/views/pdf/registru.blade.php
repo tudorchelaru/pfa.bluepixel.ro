@@ -16,7 +16,7 @@
             margin-bottom: 15px;
         }
         .header h1 {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -29,11 +29,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 0;
         }
         th {
             background: #2c3e50;
             color: #fff;
-            padding: 6px 4px;
+            padding: 5px 4px;
             text-align: center;
             font-size: 8px;
             border: 1px solid #2c3e50;
@@ -44,14 +45,36 @@
             font-size: 8px;
             vertical-align: middle;
         }
-        .col-nr { width: 4%; text-align: center; }
-        .col-data { width: 9%; text-align: center; }
-        .col-doc { width: 35%; }
-        .col-suma { width: 13%; text-align: right; }
-        tr:nth-child(even) { background: #f8f9fa; }
-        tr.incasare td { }
-        tr.plata td { }
-        .totals-row td {
+        .col-nr    { width: 4%;  text-align: center; }
+        .col-data  { width: 9%;  text-align: center; }
+        .col-doc   { width: 37%; }
+        .col-suma  { width: 11%; text-align: right; }
+        .col-deduct{ width: 7%;  text-align: center; }
+
+        tr:nth-child(even) td { background: #f8f9fa; }
+
+        .month-header td {
+            background: #34495e;
+            color: #fff;
+            font-weight: bold;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 5px 8px;
+            border-color: #34495e;
+        }
+
+        .month-total td {
+            background: #ecf0f1;
+            font-weight: bold;
+            font-size: 8px;
+            border: 1px solid #bbb;
+            text-align: right;
+            color: #2c3e50;
+        }
+        .month-total td:first-child { text-align: right; }
+
+        .grand-total td {
             background: #2c3e50;
             color: #fff;
             font-weight: bold;
@@ -59,15 +82,20 @@
             text-align: right;
             font-size: 9px;
         }
-        .totals-row td:first-child { text-align: center; }
-        .footer {
-            margin-top: 20px;
-            font-size: 9px;
-            color: #555;
-            text-align: right;
+
+        .summary-table {
+            width: 50%;
+            margin-left: auto;
+            margin-top: 15px;
+            border-collapse: collapse;
         }
-        .amount-positive { color: #27ae60; }
-        .amount-negative { color: #e74c3c; }
+        .summary-table td {
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            font-size: 9px;
+        }
+        .summary-table .label { font-weight: bold; background: #ecf0f1; }
+        .summary-table .value { text-align: right; }
     </style>
 </head>
 <body>
@@ -78,11 +106,24 @@
 </div>
 
 @php
-    $totalIncasariNumerar = 0;
-    $totalIncasariBanca   = 0;
-    $totalPlatiNumerar    = 0;
-    $totalPlatiBanca      = 0;
-    $nr = 1;
+    $luniRo = [
+        1=>'Ianuarie', 2=>'Februarie', 3=>'Martie', 4=>'Aprilie',
+        5=>'Mai', 6=>'Iunie', 7=>'Iulie', 8=>'August',
+        9=>'Septembrie', 10=>'Octombrie', 11=>'Noiembrie', 12=>'Decembrie',
+    ];
+
+    // Grupeaza pe luni
+    $byMonth = [];
+    foreach ($entries as $entry) {
+        $m = (int) $entry->data->format('n');
+        $byMonth[$m][] = $entry;
+    }
+    ksort($byMonth);
+
+    $grandIncNum  = 0;
+    $grandIncBanca = 0;
+    $grandPlatNum  = 0;
+    $grandPlatBanca = 0;
 @endphp
 
 <table>
@@ -95,57 +136,96 @@
             <th class="col-suma">Incasari<br>Banca</th>
             <th class="col-suma">Plati<br>Numerar</th>
             <th class="col-suma">Plati<br>Banca</th>
-            <th style="width:8%;text-align:center;">Deduct.<br>%</th>
+            <th class="col-deduct">Deduct.<br>%</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($entries as $entry)
+    @php $nr = 1; @endphp
+    @foreach($byMonth as $luna => $lunaEntries)
         @php
-            $incNumerar = ($entry->tip === 'incasare' && $entry->metoda === 'numerar') ? $entry->suma : null;
-            $incBanca   = ($entry->tip === 'incasare' && $entry->metoda === 'banca')   ? $entry->suma : null;
-            $platNumerar= ($entry->tip === 'plata'    && $entry->metoda === 'numerar') ? $entry->suma : null;
-            $platBanca  = ($entry->tip === 'plata'    && $entry->metoda === 'banca')   ? $entry->suma : null;
-
-            if ($incNumerar)  $totalIncasariNumerar += $incNumerar;
-            if ($incBanca)    $totalIncasariBanca   += $incBanca;
-            if ($platNumerar) $totalPlatiNumerar    += $platNumerar;
-            if ($platBanca)   $totalPlatiBanca      += $platBanca;
+            $mIncNum   = 0; $mIncBanca  = 0;
+            $mPlatNum  = 0; $mPlatBanca = 0;
         @endphp
-        <tr class="{{ $entry->tip }}">
+
+        {{-- Header luna --}}
+        <tr class="month-header">
+            <td colspan="8">{{ $luniRo[$luna] }}</td>
+        </tr>
+
+        @foreach($lunaEntries as $entry)
+        @php
+            $incNum  = ($entry->tip==='incasare' && $entry->metoda==='numerar') ? (float)$entry->suma : null;
+            $incBanca= ($entry->tip==='incasare' && $entry->metoda==='banca')   ? (float)$entry->suma : null;
+            $platNum = ($entry->tip==='plata'    && $entry->metoda==='numerar') ? (float)$entry->suma : null;
+            $platBanca=($entry->tip==='plata'    && $entry->metoda==='banca')   ? (float)$entry->suma : null;
+
+            if ($incNum)   $mIncNum   += $incNum;
+            if ($incBanca) $mIncBanca += $incBanca;
+            if ($platNum)  $mPlatNum  += $platNum;
+            if ($platBanca)$mPlatBanca+= $platBanca;
+        @endphp
+        <tr>
             <td class="col-nr">{{ $nr++ }}</td>
             <td class="col-data">{{ $entry->data->format('d.m.Y') }}</td>
             <td class="col-doc">{{ $entry->document }}</td>
-            <td class="col-suma">{{ $incNumerar  ? number_format($incNumerar,  2, ',', '.') : '' }}</td>
-            <td class="col-suma">{{ $incBanca    ? number_format($incBanca,    2, ',', '.') : '' }}</td>
-            <td class="col-suma">{{ $platNumerar ? number_format($platNumerar, 2, ',', '.') : '' }}</td>
-            <td class="col-suma">{{ $platBanca   ? number_format($platBanca,   2, ',', '.') : '' }}</td>
-            <td style="text-align:center;">{{ $entry->tip === 'plata' ? $entry->deductibilitate . '%' : '' }}</td>
+            <td class="col-suma">{{ $incNum   !== null ? number_format($incNum,   2, ',', '.') : '' }}</td>
+            <td class="col-suma">{{ $incBanca !== null ? number_format($incBanca, 2, ',', '.') : '' }}</td>
+            <td class="col-suma">{{ $platNum  !== null ? number_format($platNum,  2, ',', '.') : '' }}</td>
+            <td class="col-suma">{{ $platBanca!== null ? number_format($platBanca,2, ',', '.') : '' }}</td>
+            <td class="col-deduct">{{ $entry->tip === 'plata' ? $entry->deductibilitate.'%' : '' }}</td>
         </tr>
         @endforeach
-    </tbody>
-    <tfoot>
-        <tr class="totals-row">
-            <td colspan="3" style="text-align:right;">TOTAL</td>
-            <td>{{ number_format($totalIncasariNumerar, 2, ',', '.') }}</td>
-            <td>{{ number_format($totalIncasariBanca,   2, ',', '.') }}</td>
-            <td>{{ number_format($totalPlatiNumerar,    2, ',', '.') }}</td>
-            <td>{{ number_format($totalPlatiBanca,      2, ',', '.') }}</td>
+
+        @php
+            $grandIncNum   += $mIncNum;
+            $grandIncBanca += $mIncBanca;
+            $grandPlatNum  += $mPlatNum;
+            $grandPlatBanca+= $mPlatBanca;
+        @endphp
+
+        {{-- Total luna --}}
+        <tr class="month-total">
+            <td colspan="3" style="text-align:right;">TOTAL {{ strtoupper($luniRo[$luna]) }}</td>
+            <td class="col-suma">{{ number_format($mIncNum,   2, ',', '.') }}</td>
+            <td class="col-suma">{{ number_format($mIncBanca, 2, ',', '.') }}</td>
+            <td class="col-suma">{{ number_format($mPlatNum,  2, ',', '.') }}</td>
+            <td class="col-suma">{{ number_format($mPlatBanca,2, ',', '.') }}</td>
             <td></td>
         </tr>
-    </tfoot>
+    @endforeach
+
+    {{-- Grand total --}}
+    <tr class="grand-total">
+        <td colspan="3" style="text-align:right;">TOTAL</td>
+        <td class="col-suma">{{ number_format($grandIncNum,   2, ',', '.') }}</td>
+        <td class="col-suma">{{ number_format($grandIncBanca, 2, ',', '.') }}</td>
+        <td class="col-suma">{{ number_format($grandPlatNum,  2, ',', '.') }}</td>
+        <td class="col-suma">{{ number_format($grandPlatBanca,2, ',', '.') }}</td>
+        <td></td>
+    </tr>
+    </tbody>
 </table>
 
 @php
-    $totalIncasari = $totalIncasariNumerar + $totalIncasariBanca;
-    $totalPlati    = $totalPlatiNumerar + $totalPlatiBanca;
+    $totalIncasari = $grandIncNum + $grandIncBanca;
+    $totalPlati    = $grandPlatNum + $grandPlatBanca;
     $sold          = $totalIncasari - $totalPlati;
 @endphp
 
-<div class="footer">
-    <p>Total incasari: <strong>{{ number_format($totalIncasari, 2, ',', '.') }} RON</strong>
-    &nbsp;|&nbsp; Total plati: <strong>{{ number_format($totalPlati, 2, ',', '.') }} RON</strong>
-    &nbsp;|&nbsp; Sold: <strong>{{ number_format($sold, 2, ',', '.') }} RON</strong></p>
-</div>
+<table class="summary-table">
+    <tr>
+        <td class="label">Total incasari:</td>
+        <td class="value">{{ number_format($totalIncasari, 2, ',', '.') }} RON</td>
+    </tr>
+    <tr>
+        <td class="label">Total plati:</td>
+        <td class="value">{{ number_format($totalPlati, 2, ',', '.') }} RON</td>
+    </tr>
+    <tr>
+        <td class="label">Sold:</td>
+        <td class="value" style="font-weight:bold;">{{ number_format($sold, 2, ',', '.') }} RON</td>
+    </tr>
+</table>
 
 </body>
 </html>
