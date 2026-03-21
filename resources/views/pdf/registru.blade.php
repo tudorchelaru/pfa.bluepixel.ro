@@ -84,18 +84,18 @@
         }
 
         .summary-table {
-            width: 50%;
+            width: 60%;
             margin-left: auto;
-            margin-top: 15px;
+            margin-top: 18px;
             border-collapse: collapse;
         }
         .summary-table td {
-            padding: 5px 8px;
-            border: 1px solid #ccc;
+            padding: 6px 8px;
+            border: 1px solid #bbb;
             font-size: 9px;
         }
-        .summary-table .label { font-weight: bold; background: #ecf0f1; }
-        .summary-table .value { text-align: right; }
+        .summary-table .label { font-weight: bold; background: #ecf0f1; width: 60%; }
+        .summary-table .value { text-align: right; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -209,21 +209,56 @@
 @php
     $totalIncasari = $grandIncNum + $grandIncBanca;
     $totalPlati    = $grandPlatNum + $grandPlatBanca;
-    $sold          = $totalIncasari - $totalPlati;
+    $profit        = $totalIncasari - $totalPlati;
+
+    // Cheltuieli deductibile:
+    // - diverse / 100%  → suma integrala
+    // - cincizeci_la_suta / 50% → suma * 50%
+    // - rata_leasing → max 1500 RON/luna
+    $cheltDeduct = 0;
+    $leasingPerLuna = [];
+    foreach ($entries as $e) {
+        if ($e->tip !== 'plata') continue;
+        $suma = (float) $e->suma;
+        if ($e->tip_cheltuiala === 'rata_leasing') {
+            $luna = $e->data->format('Y-m');
+            $leasingPerLuna[$luna] = ($leasingPerLuna[$luna] ?? 0) + $suma;
+        } elseif ($e->tip_cheltuiala === 'cincizeci_la_suta' || $e->deductibilitate == 50) {
+            $cheltDeduct += $suma * 0.5;
+        } else {
+            $cheltDeduct += $suma * ($e->deductibilitate / 100);
+        }
+    }
+    // Aplica plafonul de 1500 RON/luna pentru leasing
+    foreach ($leasingPerLuna as $luna => $total) {
+        $cheltDeduct += min($total, 1500);
+    }
+
+    $profitImpozabil = ceil($totalIncasari - $cheltDeduct); // rotunjit in sus la RON intreg
+    $impozit         = ceil($profitImpozabil * 0.10);
 @endphp
 
 <table class="summary-table">
     <tr>
-        <td class="label">Total incasari:</td>
-        <td class="value">{{ number_format($totalIncasari, 2, ',', '.') }} RON</td>
+        <td class="label">TOTAL INCASARI / PLATI:</td>
+        <td class="value">{{ number_format($totalIncasari, 2, ',', '.') }}</td>
+        <td class="value">{{ number_format($totalPlati,    2, ',', '.') }}</td>
     </tr>
     <tr>
-        <td class="label">Total plati:</td>
-        <td class="value">{{ number_format($totalPlati, 2, ',', '.') }} RON</td>
+        <td class="label">PROFIT:</td>
+        <td colspan="2" class="value">{{ number_format($profit, 2, ',', '.') }}</td>
     </tr>
     <tr>
-        <td class="label">Sold:</td>
-        <td class="value" style="font-weight:bold;">{{ number_format($sold, 2, ',', '.') }} RON</td>
+        <td class="label">PROFIT IMPOZABIL:</td>
+        <td colspan="2" class="value">{{ number_format($profitImpozabil, 2, ',', '.') }}</td>
+    </tr>
+    <tr>
+        <td class="label">IMPOZIT (10%) aplicabil:</td>
+        <td colspan="2" class="value">{{ number_format($impozit, 2, ',', '.') }}</td>
+    </tr>
+    <tr>
+        <td class="label">CHELT. DEDUCT.(50% + max 1500 leasing/luna):</td>
+        <td colspan="2" class="value">{{ number_format($cheltDeduct, 2, ',', '.') }}</td>
     </tr>
 </table>
 
