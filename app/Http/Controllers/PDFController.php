@@ -38,7 +38,10 @@ class PDFController extends Controller
         $pdf = Pdf::loadView('pdf.registru', compact('user', 'entries', 'year', 'firma'))
             ->setPaper('a4', 'landscape');
 
-        $filename = strtolower($user->username) . '_registru_' . $year . '.pdf';
+        $slug     = $firma ? $firma->nume : $user->username;
+        $slug     = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '_', $slug));
+        $slug     = trim($slug, '_');
+        $filename = 'registru_' . $slug . '_' . $year . '.pdf';
 
         return $pdf->download($filename);
     }
