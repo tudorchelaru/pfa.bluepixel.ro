@@ -10,19 +10,19 @@ class RegistruController extends Controller
 {
     public function create()
     {
-        $firme = Auth::user()->firme()->orderByDesc('is_default')->orderBy('nume')->get();
-        return view('registru.create', compact('firme'));
+        $firma = Auth::user()->firme()->first();
+        return view('registru.create', compact('firma'));
     }
 
     public function store(Request $request)
     {
-        if (Auth::user()->firme()->doesntExist()) {
+        $firma = Auth::user()->firme()->first();
+        if (!$firma) {
             return redirect()->route('registru.create')
-                ->with('error', 'Trebuie să adaugi cel puțin o firmă înainte de a adăuga înregistrări.');
+                ->with('error', 'Trebuie să configurezi datele firmei înainte de a adăuga înregistrări.');
         }
 
         $validated = $request->validate([
-            'firma_id'       => 'required|exists:firme,id',
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
@@ -34,7 +34,8 @@ class RegistruController extends Controller
             'bon_imagine'    => 'nullable|file|mimes:jpeg,jpg,png,gif,webp,pdf|max:20480',
         ]);
 
-        $validated['user_id'] = Auth::id();
+        $validated['user_id']  = Auth::id();
+        $validated['firma_id'] = $firma->id;
 
         if ($validated['tip'] === 'incasare') {
             $validated['tip_cheltuiala'] = null;
@@ -139,9 +140,7 @@ class RegistruController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $firme = Auth::user()->firme()->orderByDesc('is_default')->orderBy('nume')->get();
-
-        return view('registru.edit', compact('entry', 'firme'));
+        return view('registru.edit', compact('entry'));
     }
 
     public function update(Request $request, $id)

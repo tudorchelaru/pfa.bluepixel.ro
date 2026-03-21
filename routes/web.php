@@ -44,8 +44,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/cont', [AccountController::class, 'index'])->name('account.index');
     Route::patch('/cont/profil', [AccountController::class, 'updateProfil'])->name('account.profil');
     Route::patch('/cont/parola', [AccountController::class, 'updateParola'])->name('account.parola');
-    Route::post('/cont/firme', [AccountController::class, 'storeFirma'])->name('account.firma.store');
-    Route::patch('/cont/firme/{firma}', [AccountController::class, 'updateFirma'])->name('account.firma.update');
-    Route::patch('/cont/firme/{firma}/default', [AccountController::class, 'setDefault'])->name('account.firma.default');
-    Route::delete('/cont/firme/{firma}', [AccountController::class, 'destroyFirma'])->name('account.firma.destroy');
+    Route::post('/cont/firma', [AccountController::class, 'saveFirma'])->name('account.firma.save');
 });
