@@ -433,7 +433,7 @@ body {
 </section>
 
 <footer class="footer">
-  <span>&copy; 2026 <span style="letter-spacing:3px;font-weight:200;">NUVA</span><span style="color:var(--orange);">.</span> &nbsp;&middot;&nbsp; by <a href="https://bluepixel.ro">BluePizel</a></span>
+  <span>&copy; 2026 <span style="letter-spacing:3px;font-weight:200;">NUVA</span><span style="color:var(--orange);">.</span> &nbsp;&middot;&nbsp; by <a href="https://bluepixel.ro" style="display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:inherit;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="23" height="23" style="vertical-align:middle;border-radius:4px;"><rect width="64" height="64" rx="12" fill="#fafafa"/><text x="4" y="53" font-family="Inter,Arial,sans-serif" font-size="50" font-weight="800" fill="#0a0a0a">B</text><text x="33" y="53" font-family="Inter,Arial,sans-serif" font-size="50" font-weight="800" fill="#0057ff">P</text></svg>BluePixel</a></span>
   <span><a href="#">Termeni</a> &nbsp;&middot;&nbsp; <a href="#">Confidențialitate</a></span>
 </footer>
 
