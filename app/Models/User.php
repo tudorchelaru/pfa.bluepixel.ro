@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['username', 'password'];
+    protected $fillable = ['username', 'email', 'password'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -24,5 +24,15 @@ class User extends Authenticatable
     public function registruEntries()
     {
         return $this->hasMany(RegistruEntry::class);
+    }
+
+    public function firme()
+    {
+        return $this->hasMany(Firma::class);
+    }
+
+    public function firmaDefault()
+    {
+        return $this->hasOne(Firma::class)->where('is_default', true)->latestOfMany();
     }
 }

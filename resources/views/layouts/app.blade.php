@@ -860,8 +860,10 @@
         <a href="{{ route('registru.create') }}">+ Adauga</a>
         <a href="{{ route('registre.index') }}">Registre</a>
         <a href="{{ route('pdf.index') }}">Genereaza PDF</a>
-        <span class="user-info" style="padding:0.4rem 0.5rem;">{{ Auth::user()->username }}</span>
-        <a href="{{ route('profile.change-password') }}" style="border:1px solid var(--border);">Schimba parola</a>
+        <a href="{{ route('account.index') }}"
+           style="border:1px solid var(--border); {{ request()->routeIs('account.*') ? 'background:var(--nav-hover);color:var(--text);' : '' }}">
+            {{ Auth::user()->username }}
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="btn-logout" style="cursor:pointer;border-radius:8px;width:100%;padding:0.4rem 0.85rem;font-size:0.88rem;">Logout</button>

@@ -33,7 +33,9 @@ class PDFController extends Controller
             ->orderBy('data', 'asc')
             ->get();
 
-        $pdf = Pdf::loadView('pdf.registru', compact('user', 'entries', 'year'))
+        $firma = $user->firmaDefault ?? $user->firme()->first();
+
+        $pdf = Pdf::loadView('pdf.registru', compact('user', 'entries', 'year', 'firma'))
             ->setPaper('a4', 'landscape');
 
         $filename = strtolower($user->username) . '_registru_' . $year . '.pdf';

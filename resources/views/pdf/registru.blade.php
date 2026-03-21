@@ -102,7 +102,28 @@
 
 <div class="header">
     <h1>Registru de Incasari si Plati</h1>
+
+    @if($firma)
+    <p style="font-size:12px; font-weight:bold; margin-top:6px;">
+        {{ strtoupper($firma->nume) }}
+    </p>
+    <p style="font-size:9px; color:#555; margin-top:3px;">
+        @if($firma->cui) CUI: {{ $firma->cui }} @endif
+        @if($firma->nr_reg_com) &nbsp;|&nbsp; J: {{ $firma->nr_reg_com }} @endif
+        @if($firma->adresa) &nbsp;|&nbsp; {{ $firma->adresa }} @endif
+    </p>
+    @if($firma->banca || $firma->iban)
+    <p style="font-size:9px; color:#555; margin-top:2px;">
+        @if($firma->banca) Bancă: {{ $firma->banca }} @endif
+        @if($firma->iban) &nbsp;|&nbsp; IBAN: {{ $firma->iban }} @endif
+    </p>
+    @endif
+    <p style="font-size:9px; color:#777; margin-top:4px; border-top:1px solid #ddd; padding-top:4px;">
+        Anul: <strong>{{ $year }}</strong> &nbsp;|&nbsp; Generat: {{ date('d.m.Y') }}
+    </p>
+    @else
     <p>Titular: <strong>{{ strtoupper($user->username) }}</strong> &nbsp;|&nbsp; Anul: <strong>{{ $year }}</strong> &nbsp;|&nbsp; Generat: {{ date('d.m.Y') }}</p>
+    @endif
 </div>
 
 @php
