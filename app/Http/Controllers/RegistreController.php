@@ -3,30 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\RegistruEntry;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class RegistreController extends Controller
 {
     public function index()
     {
-        $users = User::all();
-        $registre = [];
+        $user = Auth::user();
 
-        foreach ($users as $user) {
-            $years = RegistruEntry::where('user_id', $user->id)
-                ->selectRaw('YEAR(data) as year')
-                ->distinct()
-                ->orderByDesc('year')
-                ->pluck('year');
+        $years = RegistruEntry::where('user_id', $user->id)
+            ->selectRaw('YEAR(data) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
 
-            if ($years->isNotEmpty()) {
-                $registre[] = [
-                    'user'  => $user,
-                    'years' => $years,
-                ];
-            }
-        }
-
-        return view('registre.index', compact('registre'));
+        return view('registre.index', compact('user', 'years'));
     }
 }

@@ -3,39 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\RegistruEntry;
-use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class PDFController extends Controller
 {
     public function index()
     {
-        $users = User::all();
-        $registre = [];
+        $user = Auth::user();
 
-        foreach ($users as $user) {
-            $years = RegistruEntry::where('user_id', $user->id)
-                ->selectRaw('YEAR(data) as year')
-                ->distinct()
-                ->orderByDesc('year')
-                ->pluck('year');
+        $years = RegistruEntry::where('user_id', $user->id)
+            ->selectRaw('YEAR(data) as year')
+            ->distinct()
+            ->orderByDesc('year')
+            ->pluck('year');
 
-            if ($years->isNotEmpty()) {
-                $registre[] = [
-                    'user'  => $user,
-                    'years' => $years,
-                ];
-            }
-        }
-
-        return view('pdf.index', compact('registre'));
+        return view('pdf.index', compact('user', 'years'));
     }
 
     public function generate($userId, $year)
     {
-        $user = User::findOrFail($userId);
+        // Userul poate genera doar propriul PDF
+        abort_if((int) $userId !== Auth::id(), 403);
 
-        $entries = RegistruEntry::where('user_id', $userId)
+        $user = Auth::user();
+
+        $entries = RegistruEntry::where('user_id', $user->id)
             ->whereYear('data', $year)
             ->orderBy('data', 'asc')
             ->get();
