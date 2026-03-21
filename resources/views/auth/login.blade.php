@@ -13,7 +13,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PFA Expenses">
-    <link rel="apple-touch-icon" href="/pwa-icon-512.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <style>
         :root, [data-theme="dark"] {
