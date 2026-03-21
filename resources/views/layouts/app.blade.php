@@ -214,9 +214,8 @@
 <nav class="navbar-custom d-flex justify-content-between align-items-center flex-wrap gap-2">
     <a href="{{ route('dashboard') }}" class="brand">PFA Expenses</a>
     <div class="nav-links">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <a href="{{ route('registru.index') }}">Registrul meu</a>
         <a href="{{ route('registru.create') }}">+ Adauga</a>
-        <a href="{{ route('registru.index') }}">Editare Registru</a>
         <a href="{{ route('registre.index') }}">Registre</a>
         <a href="{{ route('pdf.index') }}">Genereaza PDF</a>
         <span class="user-info">| {{ Auth::user()->username }}</span>
