@@ -862,7 +862,7 @@
         <a href="{{ route('pdf.index') }}">Genereaza PDF</a>
         <a href="{{ route('account.index') }}"
            style="border:1px solid var(--border); {{ request()->routeIs('account.*') ? 'background:var(--nav-hover);color:var(--text);' : '' }}">
-            {{ Auth::user()->username }}
+            Contul meu
         </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
