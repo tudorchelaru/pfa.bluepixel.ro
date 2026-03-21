@@ -875,7 +875,79 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{{-- PWA install banner --}}
+<div id="pwa-banner" style="display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:9999;
+    background:var(--bg-card);border:1px solid var(--border);border-radius:14px;
+    padding:0.85rem 1.1rem;box-shadow:0 8px 32px rgba(0,0,0,0.35);
+    display:none;align-items:center;gap:0.85rem;max-width:340px;width:calc(100% - 2rem);">
+    <img src="/apple-touch-icon.png" style="width:40px;height:40px;border-radius:9px;flex-shrink:0;">
+    <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:0.88rem;color:var(--text);">PFA Expenses</div>
+        <div id="pwa-banner-msg" style="font-size:0.78rem;color:var(--text-muted);margin-top:0.1rem;"></div>
+    </div>
+    <div style="display:flex;gap:0.4rem;flex-shrink:0;">
+        <button id="pwa-install-btn" style="display:none;background:var(--accent);border:none;color:#fff;
+            padding:0.4rem 0.85rem;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;">
+            Instalează
+        </button>
+        <button onclick="closePwaBanner()" style="background:none;border:none;color:var(--text-muted);
+            font-size:1.3rem;cursor:pointer;line-height:1;padding:0 0.2rem;">&times;</button>
+    </div>
+</div>
+
 <script>
+// ── Service Worker ────────────────────────────────────
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+}
+
+// ── PWA Install banner ────────────────────────────────
+var _deferredPrompt = null;
+
+function closePwaBanner() {
+    var b = document.getElementById('pwa-banner');
+    if (b) b.style.display = 'none';
+    sessionStorage.setItem('pwa-banner-closed', '1');
+}
+
+function showBanner(msg, showInstallBtn) {
+    if (sessionStorage.getItem('pwa-banner-closed')) return;
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    var b = document.getElementById('pwa-banner');
+    if (!b) return;
+    document.getElementById('pwa-banner-msg').textContent = msg;
+    var btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.style.display = showInstallBtn ? 'inline-block' : 'none';
+    b.style.display = 'flex';
+}
+
+// Android Chrome: captureaza evenimentul de install
+window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _deferredPrompt = e;
+    showBanner('Adaugă aplicația pe ecranul principal.', true);
+    var btn = document.getElementById('pwa-install-btn');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            _deferredPrompt.prompt();
+            _deferredPrompt.userChoice.then(function() {
+                _deferredPrompt = null;
+                closePwaBanner();
+            });
+        });
+    }
+});
+
+// iOS Safari: nu are prompt automat, afisam instructiuni
+document.addEventListener('DOMContentLoaded', function() {
+    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    var isInApp = window.navigator.standalone === true;
+    if (isIOS && !isInApp) {
+        showBanner('Apasă   ⎙ Share  →  "Adaugă pe ecran"', false);
+    }
+});
+
 // ── Dark / Light toggle ───────────────────────────────
 function toggleTheme() {
     var html = document.documentElement;
