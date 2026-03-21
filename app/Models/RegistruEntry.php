@@ -11,6 +11,7 @@ class RegistruEntry extends Model
     protected $fillable = [
         'user_id', 'data', 'tip', 'metoda', 'suma',
         'valuta', 'document', 'deductibilitate', 'tip_cheltuiala',
+        'bon_imagine', 'bon_mime',
     ];
 
     protected function casts(): array
