@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="ro" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,55 +9,130 @@
     <link rel="shortcut icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* ── CSS Variables — dark (default) ─────────────── */
+        :root,
+        [data-theme="dark"] {
+            --bg:                  #0f172a;
+            --bg-card:             #1e293b;
+            --bg-nav:              #1e293b;
+            --bg-input:            rgba(255,255,255,0.07);
+            --border:              #334155;
+            --border-input:        rgba(255,255,255,0.18);
+            --accent:              #3b82f6;
+            --accent-hover:        #2563eb;
+            --text:                #f1f5f9;
+            --text-muted:          #94a3b8;
+            --text-link:           rgba(241,245,249,0.85);
+            --nav-hover:           rgba(255,255,255,0.09);
+            --row-hover:           rgba(255,255,255,0.04);
+            --shadow:              0 8px 32px rgba(0,0,0,0.4);
+            --nav-shadow:          0 1px 0 #334155;
+            --select-bg:           #1e293b;
+            --badge-plata-bg:      rgba(239,68,68,0.18);
+            --badge-plata-border:  rgba(239,68,68,0.45);
+            --badge-plata-text:    #fca5a5;
+            --badge-inc-bg:        rgba(34,197,94,0.18);
+            --badge-inc-border:    rgba(34,197,94,0.45);
+            --badge-inc-text:      #86efac;
+            --sumar-inc-bg:        rgba(34,197,94,0.1);
+            --sumar-inc-border:    rgba(34,197,94,0.3);
+            --sumar-pla-bg:        rgba(239,68,68,0.1);
+            --sumar-pla-border:    rgba(239,68,68,0.3);
+            --sumar-sold-bg:       rgba(255,255,255,0.06);
+            --luna-bg:             rgba(15,23,42,0.85);
+            --luna-border:         rgba(59,130,246,0.25);
+            --luna-accent:         #3b82f6;
+            --entry-card-bg:       rgba(255,255,255,0.04);
+            --entry-card-border:   rgba(255,255,255,0.09);
+            --entry-metoda-bg:     rgba(255,255,255,0.07);
+            --btn-logout-bg:       rgba(239,68,68,0.18);
+            --btn-logout-border:   rgba(239,68,68,0.4);
+            --plata-fields-bg:     rgba(59,130,246,0.08);
+            --plata-fields-border: rgba(59,130,246,0.25);
+            --atas-bg:             rgba(59,130,246,0.2);
+            --atas-border:         rgba(59,130,246,0.45);
+            --popup-bg:            #0f172a;
+            --popup-border:        rgba(255,255,255,0.15);
+        }
+
+        /* ── CSS Variables — light ───────────────────────── */
+        [data-theme="light"] {
+            --bg:                  #f8fafc;
+            --bg-card:             #ffffff;
+            --bg-nav:              #ffffff;
+            --bg-input:            #f8fafc;
+            --border:              #e2e8f0;
+            --border-input:        #cbd5e1;
+            --text:                #0f172a;
+            --text-muted:          #64748b;
+            --text-link:           #334155;
+            --nav-hover:           rgba(59,130,246,0.07);
+            --row-hover:           rgba(0,0,0,0.03);
+            --shadow:              0 4px 20px rgba(0,0,0,0.08);
+            --nav-shadow:          0 1px 0 #e2e8f0, 0 2px 8px rgba(0,0,0,0.05);
+            --select-bg:           #ffffff;
+            --badge-plata-bg:      #fee2e2;
+            --badge-plata-border:  #fca5a5;
+            --badge-plata-text:    #dc2626;
+            --badge-inc-bg:        #dcfce7;
+            --badge-inc-border:    #86efac;
+            --badge-inc-text:      #16a34a;
+            --sumar-inc-bg:        #dcfce7;
+            --sumar-inc-border:    #86efac;
+            --sumar-pla-bg:        #fee2e2;
+            --sumar-pla-border:    #fca5a5;
+            --sumar-sold-bg:       #f1f5f9;
+            --luna-bg:             #f1f5f9;
+            --luna-border:         rgba(59,130,246,0.2);
+            --luna-accent:         #3b82f6;
+            --entry-card-bg:       #f8fafc;
+            --entry-card-border:   #e2e8f0;
+            --entry-metoda-bg:     #f1f5f9;
+            --btn-logout-bg:       #fee2e2;
+            --btn-logout-border:   #fca5a5;
+            --plata-fields-bg:     rgba(59,130,246,0.05);
+            --plata-fields-border: rgba(59,130,246,0.2);
+            --atas-bg:             rgba(59,130,246,0.1);
+            --atas-border:         rgba(59,130,246,0.3);
+            --popup-bg:            #ffffff;
+            --popup-border:        #e2e8f0;
+        }
+
+        /* ── Reset & Base ────────────────────────────────── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
+            color: var(--text);
+            transition: background 0.2s ease, color 0.2s ease;
         }
 
+        /* ── Navbar ──────────────────────────────────────── */
         .navbar-custom {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            background: var(--bg-nav);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--nav-shadow);
             padding: 0.75rem 1.25rem;
+            transition: background 0.2s ease;
+        }
+
+        [data-theme="dark"] .navbar-custom {
+            background: linear-gradient(135deg, #1e293b 0%, #162032 100%);
         }
 
         .navbar-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        @media (min-width: 768px) {
-            .navbar-custom {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .navbar-top { flex-shrink: 0; }
-            .nav-toggler { display: none !important; }
-            #navLinks {
-                display: flex !important;
-                flex-direction: row;
-                margin-top: 0;
-                padding-top: 0;
-                border-top: none;
-            }
-            #navLinks a, #navLinks button {
-                width: auto;
-            }
-            #navLinks .user-info {
-                padding: 0.4rem 0.5rem;
-            }
+            gap: 1.5rem;
         }
 
         .navbar-custom .brand {
             font-size: 1.3rem;
             font-weight: 700;
-            color: #fff;
+            color: var(--text);
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -89,9 +164,15 @@
             display: block;
             width: 24px;
             height: 2px;
-            background: #fff;
+            background: var(--text);
             border-radius: 2px;
             transition: all 0.3s;
+        }
+
+        .navbar-top-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .nav-links {
@@ -101,273 +182,336 @@
             flex-wrap: wrap;
         }
 
-        .nav-links a, .nav-links button {
-            color: rgba(255,255,255,0.85);
+        .nav-links a,
+        .nav-links button {
+            color: var(--text-link);
             text-decoration: none;
             padding: 0.4rem 0.85rem;
             border-radius: 8px;
-            transition: all 0.2s;
+            transition: background 0.15s, color 0.15s;
             font-size: 0.88rem;
+            border: none;
+            background: none;
+            cursor: pointer;
         }
 
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.15);
+        .nav-links a:hover,
+        .nav-links button:hover {
+            background: var(--nav-hover);
+            color: var(--text);
+        }
+
+        .btn-logout {
+            background: var(--btn-logout-bg) !important;
+            border: 1px solid var(--btn-logout-border) !important;
+            color: var(--badge-plata-text) !important;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239,68,68,0.3) !important;
+        }
+
+        /* Theme toggle */
+        .btn-theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--nav-hover);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            transition: background 0.2s, border-color 0.2s;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .btn-theme-toggle:hover {
+            background: var(--accent);
+            border-color: var(--accent);
             color: #fff;
         }
 
-        .nav-links .btn-logout {
-            background: rgba(220,53,69,0.3);
-            border: 1px solid rgba(220,53,69,0.5);
-        }
-
-        .nav-links .btn-logout:hover {
-            background: rgba(220,53,69,0.5);
-        }
-
+        /* ── Page layout ─────────────────────────────────── */
         .page-content {
             padding: 1.5rem 1.25rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        @media (max-width: 767px) {
-            .nav-toggler { display: flex; }
-
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                align-items: stretch;
-                margin-top: 0.75rem;
-                padding-top: 0.75rem;
-                border-top: 1px solid rgba(255,255,255,0.15);
-                gap: 0.25rem;
-            }
-
-            .nav-links.open { display: flex; }
-
-            .nav-links a, .nav-links button {
-                padding: 0.65rem 1rem;
-                font-size: 0.95rem;
-                text-align: left;
-                width: 100%;
-            }
-
-            .nav-links .user-info {
-                padding: 0.4rem 1rem;
-                font-size: 0.85rem;
-                opacity: 0.7;
-            }
-
-            .page-content {
-                padding: 1rem 0.75rem;
-            }
-
-            .glass-card {
-                padding: 1.25rem 1rem;
-                border-radius: 14px;
-            }
-
-            .page-title {
-                font-size: 1.4rem;
-            }
-        }
-
+        /* ── Glass card ──────────────────────────────────── */
         .glass-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
             padding: 2rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            animation: fadeInUp 0.3s ease-out forwards;
+            transition: background 0.2s ease, border-color 0.2s ease;
         }
 
+        /* ── Page title ──────────────────────────────────── */
         .page-title {
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
+            color: var(--text);
         }
 
+        /* ── Alerts ──────────────────────────────────────── */
         .alert-success-custom {
-            background: rgba(40,167,69,0.2);
-            border: 1px solid rgba(40,167,69,0.5);
-            color: #fff;
+            background: var(--sumar-inc-bg);
+            border: 1px solid var(--sumar-inc-border);
+            color: var(--badge-inc-text);
             border-radius: 10px;
             padding: 0.75rem 1rem;
             margin-bottom: 1rem;
         }
 
         .alert-danger-custom {
-            background: rgba(220,53,69,0.2);
-            border: 1px solid rgba(220,53,69,0.5);
-            color: #fff;
+            background: var(--sumar-pla-bg);
+            border: 1px solid var(--sumar-pla-border);
+            color: var(--badge-plata-text);
             border-radius: 10px;
             padding: 0.75rem 1rem;
             margin-bottom: 1rem;
         }
 
-        .form-label { color: rgba(255,255,255,0.95); font-weight: 600; }
+        /* ── Forms ───────────────────────────────────────── */
+        .form-label {
+            color: var(--text);
+            font-weight: 600;
+        }
 
-        .form-control, .form-select {
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.3);
+        .form-control,
+        .form-select {
+            background: var(--bg-input);
+            border: 1.5px solid var(--border-input);
             border-radius: 10px;
-            color: #fff;
+            color: var(--text);
             padding: 0.75rem 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
 
-        .form-control::placeholder { color: rgba(255,255,255,0.5); }
-        .form-control:focus, .form-select:focus {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
-            color: #fff;
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+        .form-control::placeholder { color: var(--text-muted); }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: var(--bg-input);
+            border-color: var(--accent);
+            color: var(--text);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
         }
 
-        .form-select option { background: #764ba2; color: #fff; }
+        .form-select option { background: var(--select-bg); color: var(--text); }
 
+        /* ── Buttons ─────────────────────────────────────── */
         .btn-primary-custom {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--accent);
             border: none;
             border-radius: 10px;
             color: #fff;
             padding: 0.75rem 1.5rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
             text-decoration: none;
             display: inline-block;
         }
 
         .btn-primary-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102,126,234,0.5);
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(59,130,246,0.35);
             color: #fff;
         }
 
         .btn-danger-custom {
-            background: rgba(220,53,69,0.7);
-            border: 1px solid rgba(220,53,69,0.8);
+            background: var(--badge-plata-bg);
+            border: 1px solid var(--badge-plata-border);
             border-radius: 8px;
-            color: #fff;
+            color: var(--badge-plata-text);
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.15s;
             text-decoration: none;
         }
 
-        .btn-danger-custom:hover { background: rgba(220,53,69,0.9); color: #fff; }
+        .btn-danger-custom:hover {
+            background: rgba(239,68,68,0.3);
+            color: var(--badge-plata-text);
+        }
 
         .btn-edit-custom {
-            background: rgba(255,193,7,0.3);
-            border: 1px solid rgba(255,193,7,0.5);
+            background: rgba(234,179,8,0.12);
+            border: 1px solid rgba(234,179,8,0.3);
             border-radius: 8px;
-            color: #fff;
+            color: var(--text);
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background 0.15s;
             text-decoration: none;
         }
 
-        .btn-edit-custom:hover { background: rgba(255,193,7,0.5); color: #fff; }
+        .btn-edit-custom:hover {
+            background: rgba(234,179,8,0.25);
+            color: var(--text);
+        }
 
-        table { color: #fff; }
+        /* ── Tables ──────────────────────────────────────── */
+        table { color: var(--text); }
 
         table thead th {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.9);
-            border-color: rgba(255,255,255,0.2);
+            background: transparent;
+            color: var(--text-muted);
+            border-color: var(--border);
             font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
 
         table tbody td {
-            border-color: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.9);
+            border-color: var(--border);
+            color: var(--text);
             vertical-align: middle;
         }
 
-        table tbody tr:hover { background: rgba(255,255,255,0.05); }
+        table tbody tr {
+            transition: background-color 0.15s ease;
+        }
 
+        table tbody tr:hover { background: var(--row-hover); }
+
+        /* ── Badges ──────────────────────────────────────── */
         .badge-incasare {
-            background: rgba(40,167,69,0.4);
-            border: 1px solid rgba(40,167,69,0.6);
-            color: #fff;
-            padding: 0.3rem 0.7rem;
+            background: var(--badge-inc-bg);
+            border: 1px solid var(--badge-inc-border);
+            color: var(--badge-inc-text);
+            padding: 0.2rem 0.55rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         .badge-plata {
-            background: rgba(220,53,69,0.4);
-            border: 1px solid rgba(220,53,69,0.6);
-            color: #fff;
-            padding: 0.3rem 0.7rem;
+            background: var(--badge-plata-bg);
+            border: 1px solid var(--badge-plata-border);
+            color: var(--badge-plata-text);
+            padding: 0.2rem 0.55rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
-        .user-info {
-            color: rgba(255,255,255,0.8);
-            font-size: 0.9rem;
-        }
+        /* ── User info ───────────────────────────────────── */
+        .user-info { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* Butoane icon-only in tabel */
+        /* ── Table action buttons ────────────────────────── */
         .btn-tbl {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 26px;
-            height: 26px;
+            gap: 0.25rem;
             border-radius: 6px;
             font-size: 0.8rem;
             text-decoration: none;
-            color: #fff;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 0.2rem 0.45rem;
             vertical-align: middle;
+            white-space: nowrap;
+            transition: opacity 0.15s, transform 0.1s;
         }
-        .btn-tbl-green  { background: rgba(40,167,69,0.35);  border: 1px solid rgba(40,167,69,0.5); }
-        .btn-tbl-yellow { background: rgba(255,193,7,0.35);  border: 1px solid rgba(255,193,7,0.5); }
-        .btn-tbl-red    { background: rgba(220,53,69,0.45);  border: 1px solid rgba(220,53,69,0.6); }
 
-        .registru-table { font-size: 0.82rem; }
-        .registru-table th { font-size: 0.75rem; font-weight: 600; white-space: nowrap; padding: 0.4rem 0.35rem; }
-        .registru-table td { padding: 0.35rem 0.35rem; vertical-align: middle; }
-        .registru-table .col-doc { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-tbl:hover { opacity: 0.82; transform: scale(1.06); }
+
+        .btn-tbl-green  { background: rgba(34,197,94,0.18);  border: 1px solid rgba(34,197,94,0.4) !important;  color: #86efac; }
+        .btn-tbl-yellow { background: rgba(234,179,8,0.18);  border: 1px solid rgba(234,179,8,0.4) !important;  color: #fde68a; }
+        .btn-tbl-red    { background: rgba(239,68,68,0.18);  border: 1px solid rgba(239,68,68,0.4) !important;  color: #fca5a5; }
+
+        [data-theme="light"] .btn-tbl-green  { color: #15803d; }
+        [data-theme="light"] .btn-tbl-yellow { color: #92400e; }
+        [data-theme="light"] .btn-tbl-red    { color: #dc2626; }
+
+        /* ── Registru table sizing ───────────────────────── */
+        .registru-table { font-size: 0.85rem; }
+        .registru-table th { font-size: 0.75rem; white-space: nowrap; padding: 0.4rem 0.5rem; }
+        .registru-table td { padding: 0.4rem 0.5rem; vertical-align: middle; }
+        .registru-table .col-doc { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .registru-table .col-suma { white-space: nowrap; font-weight: 600; }
         .registru-table .col-actiuni { white-space: nowrap; }
 
-        .badge-incasare, .badge-plata {
-            padding: 0.2rem 0.45rem;
-            font-size: 0.72rem;
-        }
+        /* ── Sumar row ───────────────────────────────────── */
+        .sumar-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .sumar-row span { padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.88rem; white-space: nowrap; }
+        .sumar-inc  { background: var(--sumar-inc-bg);  border: 1px solid var(--sumar-inc-border);  color: var(--badge-inc-text); }
+        .sumar-pla  { background: var(--sumar-pla-bg);  border: 1px solid var(--sumar-pla-border);  color: var(--badge-plata-text); }
+        .sumar-sold { background: var(--sumar-sold-bg); border: 1px solid var(--border);             color: var(--text); }
 
-        .sumar-row {
+        /* ── Luna header ─────────────────────────────────── */
+        .luna-section { margin-bottom: 1.75rem; }
+
+        .luna-header {
             display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-        .sumar-row span {
-            padding: 0.4rem 0.9rem;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--luna-bg);
+            border: 1px solid var(--luna-border);
+            border-left: 4px solid var(--luna-accent);
             border-radius: 8px;
-            font-size: 0.88rem;
-            white-space: nowrap;
+            transition: background 0.2s;
         }
-        .sumar-inc  { background: rgba(40,167,69,0.2);  border: 1px solid rgba(40,167,69,0.4); }
-        .sumar-pla  { background: rgba(220,53,69,0.2);  border: 1px solid rgba(220,53,69,0.4); }
-        .sumar-sold { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
 
-        /* Carduri mobile */
+        .luna-titlu {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .luna-sumar { display: flex; gap: 0.75rem; font-size: 0.85rem; font-weight: 700; }
+
+        .sumar-inc-sm {
+            color: var(--badge-inc-text);
+            background: var(--sumar-inc-bg);
+            padding: 0.15rem 0.5rem;
+            border-radius: 5px;
+        }
+        .sumar-pla-sm {
+            color: var(--badge-plata-text);
+            background: var(--sumar-pla-bg);
+            padding: 0.15rem 0.5rem;
+            border-radius: 5px;
+        }
+
+        /* ── Entry cards (mobile) ────────────────────────── */
         .entry-cards { display: flex; flex-direction: column; gap: 0.6rem; }
 
         .entry-card {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: var(--entry-card-bg);
+            border: 1px solid var(--entry-card-border);
             border-radius: 12px;
             padding: 0.75rem;
+            animation: fadeInUp 0.25s ease-out forwards;
+            opacity: 0;
+            transition: background 0.2s;
         }
+
+        .entry-card:nth-child(1) { animation-delay: 0.04s; }
+        .entry-card:nth-child(2) { animation-delay: 0.08s; }
+        .entry-card:nth-child(3) { animation-delay: 0.12s; }
+        .entry-card:nth-child(4) { animation-delay: 0.16s; }
+        .entry-card:nth-child(5) { animation-delay: 0.20s; }
+        .entry-card:nth-child(n+6) { animation-delay: 0.24s; }
 
         .entry-card-top {
             display: flex;
@@ -383,31 +527,19 @@
             flex-wrap: wrap;
         }
 
-        .entry-card-data {
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.7);
-        }
+        .entry-card-data { font-size: 0.8rem; color: var(--text-muted); }
 
         .entry-card-metoda {
             font-size: 0.75rem;
-            color: rgba(255,255,255,0.5);
-            background: rgba(255,255,255,0.08);
+            color: var(--text-muted);
+            background: var(--entry-metoda-bg);
             padding: 0.1rem 0.4rem;
             border-radius: 4px;
         }
 
-        .entry-card-suma {
-            font-size: 1rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
+        .entry-card-suma { font-size: 1rem; font-weight: 700; white-space: nowrap; color: var(--text); }
 
-        .entry-card-doc {
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 0.5rem;
-            word-break: break-word;
-        }
+        .entry-card-doc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem; word-break: break-word; }
 
         .entry-card-actions {
             display: flex;
@@ -415,75 +547,10 @@
             align-items: center;
             margin-top: 0.1rem;
             padding-top: 0.5rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
+            border-top: 1px solid var(--entry-card-border);
         }
 
-        /* Grupare pe luni */
-        .luna-section { margin-bottom: 2rem; }
-
-        .luna-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.6rem 1rem;
-            margin-bottom: 0.5rem;
-            background: rgba(30,15,60,0.7);
-            border: 1px solid rgba(102,126,234,0.4);
-            border-left: 4px solid rgba(102,126,234,1);
-            border-radius: 8px;
-        }
-
-        .luna-titlu {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .luna-sumar {
-            display: flex;
-            gap: 0.75rem;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .sumar-inc-sm {
-            color: #5dde8a;
-            background: rgba(40,167,69,0.15);
-            padding: 0.15rem 0.5rem;
-            border-radius: 5px;
-        }
-        .sumar-pla-sm {
-            color: #ff7a7a;
-            background: rgba(220,53,69,0.15);
-            padding: 0.15rem 0.5rem;
-            border-radius: 5px;
-        }
-
-        /* Badge atasament inline */
-        .atas-badge {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 0.4rem;
-            padding: 0.1rem 0.45rem;
-            border-radius: 5px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            background: rgba(102, 126, 234, 0.35);
-            border: 1px solid rgba(102, 126, 234, 0.6);
-            color: #fff;
-            cursor: pointer;
-            vertical-align: middle;
-            white-space: nowrap;
-            transition: background 0.15s;
-        }
-        .atas-badge:hover {
-            background: rgba(102, 126, 234, 0.6);
-        }
-
-        /* Butoane card mobile */
+        /* ── Card buttons (mobile) ───────────────────────── */
         .card-btn {
             display: inline-flex;
             align-items: center;
@@ -493,58 +560,262 @@
             font-size: 0.85rem;
             font-weight: 600;
             text-decoration: none;
-            color: #fff;
             border: none;
             cursor: pointer;
             white-space: nowrap;
+            transition: opacity 0.15s;
         }
-        .card-btn-green  { background: rgba(40,167,69,0.3);  border: 1px solid rgba(40,167,69,0.5); }
-        .card-btn-yellow { background: rgba(255,193,7,0.25); border: 1px solid rgba(255,193,7,0.5); }
-        .card-btn-red    { background: rgba(220,53,69,0.3);  border: 1px solid rgba(220,53,69,0.55); }
+        .card-btn:hover { opacity: 0.83; }
 
-        /* Butoane tabel desktop */
-        .btn-tbl {
+        .card-btn-green  { background: rgba(34,197,94,0.18);  border: 1px solid rgba(34,197,94,0.4) !important;  color: #86efac; }
+        .card-btn-yellow { background: rgba(234,179,8,0.18);  border: 1px solid rgba(234,179,8,0.4) !important;  color: #fde68a; }
+        .card-btn-red    { background: rgba(239,68,68,0.18);  border: 1px solid rgba(239,68,68,0.4) !important;  color: #fca5a5; }
+
+        [data-theme="light"] .card-btn-green  { color: #15803d; }
+        [data-theme="light"] .card-btn-yellow { color: #92400e; }
+        [data-theme="light"] .card-btn-red    { color: #dc2626; }
+
+        /* ── Attachment badge ────────────────────────────── */
+        .atas-badge {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 0.25rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            text-decoration: none;
-            color: #fff;
-            border: none;
+            margin-left: 0.4rem;
+            padding: 0.1rem 0.45rem;
+            border-radius: 5px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            background: var(--atas-bg);
+            border: 1px solid var(--atas-border);
+            color: var(--accent);
             cursor: pointer;
-            padding: 0.2rem 0.45rem;
             vertical-align: middle;
             white-space: nowrap;
+            transition: background 0.15s;
         }
-        .btn-tbl-green  { background: rgba(40,167,69,0.35);  border: 1px solid rgba(40,167,69,0.5); }
-        .btn-tbl-yellow { background: rgba(255,193,7,0.35);  border: 1px solid rgba(255,193,7,0.5); }
-        .btn-tbl-red    { background: rgba(220,53,69,0.45);  border: 1px solid rgba(220,53,69,0.6); }
+        .atas-badge:hover { background: rgba(59,130,246,0.35); }
 
-        /* Tabel desktop */
-        .registru-table { font-size: 0.85rem; }
-        .registru-table th { font-size: 0.78rem; font-weight: 600; white-space: nowrap; padding: 0.4rem 0.5rem; }
-        .registru-table td { padding: 0.4rem 0.5rem; vertical-align: middle; }
-        .registru-table .col-doc { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .registru-table .col-suma { white-space: nowrap; font-weight: 600; }
-        .registru-table .col-actiuni { white-space: nowrap; }
-        .registru-table .btn-tbl { padding: 0.2rem 0.45rem; font-size: 0.78rem; }
+        /* ── Charts ──────────────────────────────────────── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Chart period filter ─────────────────────────── */
+        .chart-filter-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .chart-filter-bar {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-filter-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-right: 0.25rem;
+        }
+
+        .chart-filter-btn {
+            display: inline-block;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            background: transparent;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+
+        .chart-filter-btn:hover {
+            background: var(--nav-hover);
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        .chart-filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        /* ── Plata fields container ──────────────────────── */
+        .plata-fields-box {
+            background: var(--plata-fields-bg);
+            padding: 1.25rem;
+            border-radius: 14px;
+            border: 1px solid var(--plata-fields-border);
+            margin-bottom: 1rem;
+        }
+
+        /* ── Bon popup ───────────────────────────────────── */
+        .bon-popup {
+            background: var(--popup-bg);
+            border: 1px solid var(--popup-border);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .bon-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.9rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .bon-popup-label { font-size: 0.82rem; color: var(--text-muted); }
+
+        .bon-popup-open {
+            font-size: 0.78rem;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid var(--atas-border);
+            border-radius: 5px;
+        }
+
+        .bon-popup-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0 0.2rem;
+        }
+
+        /* ── PDF/Registre link card ──────────────────────── */
+        .year-link-card {
+            background: rgba(59,130,246,0.12);
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .year-link-card:hover {
+            background: rgba(59,130,246,0.22);
+            transform: translateY(-1px);
+            color: var(--text);
+        }
+
+        /* ── Loading spinner ─────────────────────────────── */
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+        }
+
+        /* ── Animations ──────────────────────────────────── */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ──────────────────────────────────── */
+        @media (min-width: 768px) {
+            .navbar-custom {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .navbar-top { flex-shrink: 0; }
+            .nav-toggler { display: none !important; }
+            #navLinks {
+                display: flex !important;
+                flex-direction: row;
+                margin-top: 0;
+                padding-top: 0;
+                border-top: none;
+            }
+            #navLinks a, #navLinks button { width: auto; }
+            #navLinks .user-info { padding: 0.4rem 0.5rem; }
+        }
 
         @media (max-width: 767px) {
+            .nav-toggler { display: flex; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                align-items: stretch;
+                margin-top: 0.75rem;
+                padding-top: 0.75rem;
+                border-top: 1px solid var(--border);
+                gap: 0.25rem;
+            }
+            .nav-links.open { display: flex; }
+            .nav-links a, .nav-links button {
+                padding: 0.65rem 1rem;
+                font-size: 0.95rem;
+                text-align: left;
+                width: 100%;
+            }
+            .nav-links .user-info { padding: 0.4rem 1rem; font-size: 0.85rem; }
+            .page-content { padding: 1rem 0.75rem; }
+            .glass-card { padding: 1.25rem 1rem; border-radius: 14px; }
+            .page-title { font-size: 1.4rem; }
             .sumar-row { gap: 0.4rem; }
             .sumar-row span { padding: 0.35rem 0.6rem; font-size: 0.8rem; }
             .registru-table { font-size: 0.72rem; }
             .registru-table th { font-size: 0.65rem; padding: 0.3rem 0.2rem; }
             .registru-table td { padding: 0.3rem 0.2rem; }
             .registru-table .col-doc { max-width: 80px; }
-            .btn-tbl { width: 22px; height: 22px; font-size: 0.7rem; border-radius: 4px; }
+            .btn-tbl { font-size: 0.7rem; border-radius: 4px; }
             .badge-incasare, .badge-plata { padding: 0.15rem 0.3rem; font-size: 0.65rem; }
-            .glass-card { padding: 0.75rem 0.5rem; }
+            .charts-grid { grid-template-columns: 1fr; }
         }
     </style>
     @stack('styles')
 </head>
+
+{{-- Apply theme before first paint (no flash) --}}
+<script>
+(function() {
+    var saved = localStorage.getItem('pfa-theme');
+    var theme;
+    if (saved) {
+        // User has manually toggled → respect their choice
+        theme = saved;
+    } else {
+        // No manual preference → decide by server hour
+        // Dark: 20:00–07:59 | Light: 08:00–19:59
+        var hour = {{ date('G') }};
+        theme = (hour >= 20 || hour < 8) ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+
 <body>
 
 @auth
@@ -558,10 +829,6 @@
                             <stop offset="0%" style="stop-color:#f9d423"/>
                             <stop offset="100%" style="stop-color:#ff4e50"/>
                         </linearGradient>
-                        <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                            <stop offset="0%" style="stop-color:#43e97b"/>
-                            <stop offset="100%" style="stop-color:#38f9d7"/>
-                        </linearGradient>
                     </defs>
                     <circle cx="12" cy="12" r="10" fill="url(#coinGrad)"/>
                     <text x="12" y="16.5" font-family="Arial" font-size="12" font-weight="900" text-anchor="middle" fill="rgba(255,255,255,0.95)">₣</text>
@@ -569,20 +836,23 @@
             </span>
             PFA Expenses
         </a>
-        <button class="nav-toggler" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open');" aria-label="Meniu">
-            <span></span><span></span><span></span>
-        </button>
+        <div class="navbar-top-right">
+            <button class="btn-theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+            <button class="nav-toggler" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open');" aria-label="Meniu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
     </div>
     <div class="nav-links" id="navLinks">
         <a href="{{ route('registru.index') }}">Registrul meu</a>
         <a href="{{ route('registru.create') }}">+ Adauga</a>
         <a href="{{ route('registre.index') }}">Registre</a>
         <a href="{{ route('pdf.index') }}">Genereaza PDF</a>
-        <span class="user-info" style="color:rgba(255,255,255,0.6);font-size:0.85rem;padding:0.4rem 0.5rem;">{{ Auth::user()->username }}</span>
-        <a href="{{ route('profile.change-password') }}" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);">Schimba parola</a>
+        <span class="user-info" style="padding:0.4rem 0.5rem;">{{ Auth::user()->username }}</span>
+        <a href="{{ route('profile.change-password') }}" style="border:1px solid var(--border);">Schimba parola</a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="btn-logout" style="border:1px solid rgba(220,53,69,0.5);cursor:pointer;color:rgba(255,255,255,0.85);border-radius:8px;width:100%;">Logout</button>
+            <button type="submit" class="btn-logout" style="cursor:pointer;border-radius:8px;width:100%;padding:0.4rem 0.85rem;font-size:0.88rem;">Logout</button>
         </form>
     </div>
 </nav>
@@ -593,6 +863,44 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ── Dark / Light toggle ───────────────────────────────
+function toggleTheme() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('pfa-theme', next);
+    updateToggleIcon(next);
+    // Notify charts if present
+    if (typeof onThemeChange === 'function') onThemeChange(next);
+}
+
+function updateToggleIcon(theme) {
+    var btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.textContent = theme === 'dark' ? '🌙' : '☀️';
+}
+
+// Set correct icon immediately
+(function() {
+    var t = localStorage.getItem('pfa-theme') || 'dark';
+    updateToggleIcon(t);
+})();
+
+// ── Loading spinner on form submit ────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('form:not([onsubmit])').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            var btn = e.submitter || form.querySelector('[type="submit"]');
+            if (!btn || btn.disabled) return;
+            btn.disabled = true;
+            btn.dataset.origHtml = btn.innerHTML;
+            btn.style.minWidth = btn.offsetWidth + 'px';
+            btn.innerHTML = '<span class="btn-spinner"></span>';
+        });
+    });
+});
+</script>
 @stack('scripts')
 </body>
 </html>

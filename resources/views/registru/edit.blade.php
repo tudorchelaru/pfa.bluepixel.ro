@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div id="plata_fields" style="display:none;background:rgba(102,126,234,0.15);padding:1.25rem;border-radius:14px;border:1px solid rgba(102,126,234,0.3);margin-bottom:1rem;">
+            <div id="plata_fields" class="plata-fields-box" style="display:none;">
                 <div class="mb-3">
                     <label class="form-label">Tip cheltuiala</label>
                     <select name="tip_cheltuiala" id="tip_cheltuiala" class="form-select" disabled>
@@ -83,24 +83,24 @@
 
             <div class="mb-3">
                 <label class="form-label">Bon / Factura (optional)</label>
-                <div style="border:1px dashed rgba(255,255,255,0.25);border-radius:12px;padding:1rem;background:rgba(255,255,255,0.04);">
+                <div style="border:1px dashed var(--border-input);border-radius:12px;padding:1rem;background:var(--bg-input);">
                     @if($entry->bon_imagine)
                         <div id="bon_existent" style="text-align:center;margin-bottom:0.75rem;">
                             @if($entry->bon_mime === 'application/pdf')
                                 <a href="{{ route('registru.bon', $entry->id) }}" target="_blank"
-                                   style="display:inline-flex;flex-direction:column;align-items:center;gap:0.5rem;text-decoration:none;color:#fff;background:rgba(220,53,69,0.15);border:1px solid rgba(220,53,69,0.3);border-radius:10px;padding:1rem 2rem;">
+                                   style="display:inline-flex;flex-direction:column;align-items:center;gap:0.5rem;text-decoration:none;color:var(--badge-plata-text);background:var(--badge-plata-bg);border:1px solid var(--badge-plata-border);border-radius:10px;padding:1rem 2rem;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="rgba(255,100,100,0.9)" viewBox="0 0 16 16"><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/></svg>
-                                    <span style="font-size:0.82rem;opacity:0.7;">Document PDF existent — click pentru a deschide</span>
+                                    <span style="font-size:0.82rem;color:var(--text-muted);">Document PDF existent — click pentru a deschide</span>
                                 </a>
                             @else
                                 <img src="{{ route('registru.bon', $entry->id) }}" alt="Bon existent"
                                     style="max-width:100%;max-height:220px;border-radius:8px;object-fit:contain;">
-                                <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:0.4rem;">Poza existenta</p>
+                                <p style="color:var(--text-muted);font-size:0.8rem;margin-top:0.4rem;">Poza existenta</p>
                             @endif
                         </div>
                         <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin-bottom:0.75rem;">
                             <input type="checkbox" name="sterge_bon" value="1" onchange="toggleStergeBon(this)">
-                            <span style="font-size:0.88rem;color:rgba(255,200,200,0.85);">Sterge {{ $entry->bon_mime === 'application/pdf' ? 'documentul' : 'poza' }} existent</span>
+                            <span style="font-size:0.88rem;color:var(--badge-plata-text);">Sterge {{ $entry->bon_mime === 'application/pdf' ? 'documentul' : 'poza' }} existent</span>
                         </label>
                     @endif
                     <div class="d-flex gap-2 mb-2 flex-wrap">
@@ -126,7 +126,7 @@
                         <p id="bon_pdf_name" style="margin:0.5rem 0 0;font-size:0.85rem;color:rgba(255,255,255,0.8);"></p>
                         <button type="button" onclick="stergeBon()" style="margin-top:0.5rem;background:rgba(220,53,69,0.3);border:1px solid rgba(220,53,69,0.5);color:#fff;padding:0.25rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.85rem;">Anuleaza selectia</button>
                     </div>
-                    <p id="bon_hint" style="color:rgba(255,255,255,0.45);font-size:0.82rem;margin:0;">{{ $entry->bon_imagine ? 'Incarca o poza noua sau un PDF pentru a-l inlocui.' : 'Fa o poza cu camera, incarca o imagine sau un PDF.' }}</p>
+                    <p id="bon_hint" style="color:var(--text-muted);font-size:0.82rem;margin:0;">{{ $entry->bon_imagine ? 'Incarca o poza noua sau un PDF pentru a-l inlocui.' : 'Fa o poza cu camera, incarca o imagine sau un PDF.' }}</p>
                 </div>
             </div>
 

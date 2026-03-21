@@ -12,15 +12,68 @@
     <div class="alert-success-custom">{{ session('success') }}</div>
 @endif
 
+{{-- ── Dashboard Charts ───────────────────────────────── --}}
+@if(!$entries->isEmpty())
+
+{{-- Filtru perioadă --}}
+<div class="chart-filter-wrap mb-3">
+    <div class="chart-filter-bar">
+        <span class="chart-filter-label">Perioadă:</span>
+        @foreach([3 => '3 luni', 6 => '6 luni', 12 => '12 luni', 24 => '24 luni'] as $months => $label)
+            <a href="{{ route('registru.index', ['chart_months' => $months]) }}"
+               class="chart-filter-btn {{ !$chartYear && $chartMonths == $months ? 'active' : '' }}">
+                {{ $label }}
+            </a>
+        @endforeach
+    </div>
+    @if($availableYears->count() > 0)
+    <div class="chart-filter-bar" style="margin-top:0.5rem;">
+        <span class="chart-filter-label">An:</span>
+        @foreach($availableYears as $yr)
+            <a href="{{ route('registru.index', ['chart_year' => $yr]) }}"
+               class="chart-filter-btn {{ $chartYear == $yr ? 'active' : '' }}">
+                {{ $yr }}
+            </a>
+        @endforeach
+    </div>
+    @endif
+</div>
+
+<div class="charts-grid">
+    <div class="glass-card" style="padding:1.25rem;">
+        <p class="chart-title">
+            Venituri vs Cheltuieli &mdash;
+            @if($chartYear) {{ $chartYear }} @else ultimele {{ $chartMonths }} luni @endif
+        </p>
+        <canvas id="barChart"></canvas>
+    </div>
+    <div class="glass-card" style="padding:1.25rem;">
+        <p class="chart-title">
+            Cheltuieli pe metodă &mdash;
+            @if($chartYear) {{ $chartYear }} @else ultimele {{ $chartMonths }} luni @endif
+        </p>
+        @if(empty($chartData['donut_values']))
+            <p style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:2.5rem 0;">
+                Nu există cheltuieli în perioada selectată.
+            </p>
+        @else
+            <div style="position:relative;max-width:320px;margin:0 auto;">
+                <canvas id="donutChart"></canvas>
+            </div>
+        @endif
+    </div>
+</div>
+@endif
+
+{{-- ── Registru ───────────────────────────────────────── --}}
 <div class="glass-card">
     @if($entries->isEmpty())
-        <p style="color:rgba(255,255,255,0.6);text-align:center;padding:2rem;">Nu exista inregistrari.</p>
+        <p style="color:var(--text-muted);text-align:center;padding:2rem;">Nu exista inregistrari.</p>
     @else
-        {{-- Totaluri --}}
         @php
             $totalIncasari = $entries->where('tip', 'incasare')->sum('suma');
-            $totalPlati = $entries->where('tip', 'plata')->sum('suma');
-            $sold = $totalIncasari - $totalPlati;
+            $totalPlati    = $entries->where('tip', 'plata')->sum('suma');
+            $sold          = $totalIncasari - $totalPlati;
         @endphp
         <div class="sumar-row mb-3">
             <span class="sumar-inc">Incasari: <strong>{{ number_format($totalIncasari, 2, ',', '.') }} RON</strong></span>
@@ -29,14 +82,14 @@
         </div>
 
         @php
-            $luniRo = ['','Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+            $luniRo  = ['','Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
             $grouped = $entries->groupBy(fn($e) => $e->data->format('Y-m'));
         @endphp
 
         @foreach($grouped as $luna => $lunaEntries)
             @php
                 [$an, $luna_nr] = explode('-', $luna);
-                $titlu = $luniRo[(int)$luna_nr] . ' ' . $an;
+                $titlu   = $luniRo[(int)$luna_nr] . ' ' . $an;
                 $incLuna = $lunaEntries->where('tip', 'incasare')->sum('suma');
                 $plaLuna = $lunaEntries->where('tip', 'plata')->sum('suma');
             @endphp
@@ -139,12 +192,12 @@
 </div>
 
 {{-- Popup previzualizare atasament --}}
-<div id="bon-popup" style="display:none;position:fixed;z-index:9999;background:rgba(20,10,40,0.97);border:1px solid rgba(255,255,255,0.2);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.6);overflow:hidden;width:320px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.9rem;border-bottom:1px solid rgba(255,255,255,0.1);">
-        <span id="bon-popup-label" style="font-size:0.82rem;color:rgba(255,255,255,0.7);">Atasament</span>
+<div id="bon-popup" class="bon-popup" style="display:none;position:fixed;z-index:9999;overflow:hidden;width:320px;">
+    <div class="bon-popup-header">
+        <span id="bon-popup-label" class="bon-popup-label">Atasament</span>
         <div style="display:flex;gap:0.4rem;align-items:center;">
-            <a id="bon-popup-open" href="#" target="_blank" style="font-size:0.78rem;color:rgba(150,180,255,0.9);text-decoration:none;padding:0.2rem 0.5rem;border:1px solid rgba(150,180,255,0.3);border-radius:5px;">Deschide</a>
-            <button onclick="closeBonPopup()" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.1rem;cursor:pointer;line-height:1;padding:0 0.2rem;">&times;</button>
+            <a id="bon-popup-open" href="#" target="_blank" class="bon-popup-open">Deschide</a>
+            <button onclick="closeBonPopup()" class="bon-popup-close">&times;</button>
         </div>
     </div>
     <div id="bon-popup-content" style="width:100%;height:380px;display:flex;align-items:center;justify-content:center;"></div>
@@ -152,18 +205,149 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+// ── Charts ────────────────────────────────────────────
+const chartData = @json($chartData);
+
+function getChartThemeColors() {
+    var isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+    return {
+        grid:   isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        ticks:  isDark ? '#94a3b8' : '#64748b',
+        legend: isDark ? '#f1f5f9' : '#0f172a',
+    };
+}
+
+var barChartInstance = null;
+var donutChartInstance = null;
+
+// Bar chart
+var barCtx = document.getElementById('barChart');
+if (barCtx && chartData.labels) {
+    var c = getChartThemeColors();
+    barChartInstance = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [
+                {
+                    label: 'Incasări',
+                    data: chartData.incasari,
+                    backgroundColor: 'rgba(34,197,94,0.7)',
+                    borderColor: '#22c55e',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                },
+                {
+                    label: 'Cheltuieli',
+                    data: chartData.plati,
+                    backgroundColor: 'rgba(239,68,68,0.7)',
+                    borderColor: '#ef4444',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    labels: { color: c.legend, font: { size: 12 }, boxWidth: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ' ' + ctx.parsed.y.toLocaleString('ro-RO', { minimumFractionDigits: 2 }) + ' RON';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: c.grid },
+                    ticks: { color: c.ticks, font: { size: 11 } }
+                },
+                y: {
+                    grid: { color: c.grid },
+                    ticks: {
+                        color: c.ticks,
+                        font: { size: 11 },
+                        callback: function(v) { return v.toLocaleString('ro-RO') + ' RON'; }
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Donut chart
+var donutCtx = document.getElementById('donutChart');
+if (donutCtx && chartData.donut_labels && chartData.donut_labels.length > 0) {
+    var c = getChartThemeColors();
+    donutChartInstance = new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: chartData.donut_labels,
+            datasets: [{
+                data: chartData.donut_values,
+                backgroundColor: ['rgba(59,130,246,0.8)', 'rgba(168,85,247,0.8)', 'rgba(251,146,60,0.8)'],
+                borderColor: ['#3b82f6', '#a855f7', '#fb923c'],
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.4,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: c.legend, font: { size: 12 }, padding: 14, boxWidth: 14 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ' ' + ctx.label + ': ' + ctx.parsed.toLocaleString('ro-RO', { minimumFractionDigits: 2 }) + ' RON';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update chart colors on theme toggle
+function onThemeChange(theme) {
+    var c = getChartThemeColors();
+    if (barChartInstance) {
+        barChartInstance.options.scales.x.grid.color = c.grid;
+        barChartInstance.options.scales.x.ticks.color = c.ticks;
+        barChartInstance.options.scales.y.grid.color = c.grid;
+        barChartInstance.options.scales.y.ticks.color = c.ticks;
+        barChartInstance.options.plugins.legend.labels.color = c.legend;
+        barChartInstance.update();
+    }
+    if (donutChartInstance) {
+        donutChartInstance.options.plugins.legend.labels.color = c.legend;
+        donutChartInstance.update();
+    }
+}
+
+// ── Bon preview popup ─────────────────────────────────
 const bonPopup = document.getElementById('bon-popup');
 let activeBonBtn = null;
+let hoverTimer = null;
 
 const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
-let hoverTimer = null;
 
 function showBonPopup(btn) {
     activeBonBtn = btn;
-    const url = btn.dataset.url;
+    const url  = btn.dataset.url;
     const mime = btn.dataset.mime || 'image/jpeg';
-    const content = document.getElementById('bon-popup-content');
+    const content  = document.getElementById('bon-popup-content');
     const openLink = document.getElementById('bon-popup-open');
 
     openLink.href = url;
@@ -186,20 +370,19 @@ function showBonPopup(btn) {
 
     const rect = btn.getBoundingClientRect();
     const pw = 320, ph = 440;
-    let top = rect.bottom + 8;
+    let top  = rect.bottom + 8;
     let left = rect.left;
     if (top + ph > window.innerHeight) top = rect.top - ph - 8;
     if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
     if (left < 10) left = 10;
-    if (top < 10) top = 10;
+    if (top  < 10) top  = 10;
 
-    bonPopup.style.top = top + 'px';
+    bonPopup.style.top  = top  + 'px';
     bonPopup.style.left = left + 'px';
     bonPopup.style.display = 'block';
 }
 
-document.querySelectorAll('.btn-bon-preview').forEach(btn => {
-    // Desktop: hover
+document.querySelectorAll('.btn-bon-preview').forEach(function(btn) {
     btn.addEventListener('mouseenter', function() {
         if (isTouchDevice()) return;
         clearTimeout(hoverTimer);
@@ -207,12 +390,10 @@ document.querySelectorAll('.btn-bon-preview').forEach(btn => {
     });
     btn.addEventListener('mouseleave', function() {
         if (isTouchDevice()) return;
-        hoverTimer = setTimeout(() => {
+        hoverTimer = setTimeout(function() {
             if (!bonPopup.matches(':hover')) closeBonPopup();
         }, 300);
     });
-
-    // Click (mobil + desktop fallback)
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (activeBonBtn === btn && bonPopup.style.display !== 'none') {
@@ -223,11 +404,9 @@ document.querySelectorAll('.btn-bon-preview').forEach(btn => {
     });
 });
 
-bonPopup.addEventListener('mouseenter', () => clearTimeout(hoverTimer));
-bonPopup.addEventListener('mouseleave', () => {
-    if (!isTouchDevice()) {
-        hoverTimer = setTimeout(closeBonPopup, 200);
-    }
+bonPopup.addEventListener('mouseenter', function() { clearTimeout(hoverTimer); });
+bonPopup.addEventListener('mouseleave', function() {
+    if (!isTouchDevice()) hoverTimer = setTimeout(closeBonPopup, 200);
 });
 
 document.addEventListener('click', function(e) {

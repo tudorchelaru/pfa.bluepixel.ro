@@ -52,13 +52,78 @@ class RegistruController extends Controller
             ->with('success', 'Inregistrare adaugata cu succes!');
     }
 
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
         $entries = RegistruEntry::where('user_id', Auth::id())
             ->orderBy('data', 'desc')
             ->get();
 
-        return view('registru.index', compact('entries'));
+        // Years that have data — for the year filter buttons
+        $availableYears = $entries
+            ->groupBy(fn($e) => $e->data->format('Y'))
+            ->keys()
+            ->sort()
+            ->values();
+
+        $luniRo = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec'];
+        $chartLabels   = [];
+        $chartIncasari = [];
+        $chartPlati    = [];
+        $chartYear   = null;
+        $chartMonths = null;
+
+        // Mode A: specific year selected
+        $requestedYear = $request->get('chart_year');
+        if ($requestedYear && preg_match('/^\d{4}$/', $requestedYear)) {
+            $chartYear = (int) $requestedYear;
+
+            for ($m = 1; $m <= 12; $m++) {
+                $key = $chartYear . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
+                $chartLabels[]   = $luniRo[$m];
+                $monthEntries    = $entries->filter(fn($e) => $e->data->format('Y-m') === $key);
+                $chartIncasari[] = round((float)$monthEntries->where('tip', 'incasare')->sum('suma'), 2);
+                $chartPlati[]    = round((float)$monthEntries->where('tip', 'plata')->sum('suma'), 2);
+            }
+
+            $platiForDonut = $entries->filter(fn($e) => $e->tip === 'plata' && $e->data->year === $chartYear);
+
+        // Mode B: last N months
+        } else {
+            $chartMonths = (int) $request->get('chart_months', 6);
+            if (!in_array($chartMonths, [3, 6, 12, 24])) {
+                $chartMonths = 6;
+            }
+
+            for ($i = $chartMonths - 1; $i >= 0; $i--) {
+                $month = now()->subMonths($i);
+                $key   = $month->format('Y-m');
+                $chartLabels[]   = $luniRo[(int)$month->format('n')] . ' \'' . $month->format('y');
+                $monthEntries    = $entries->filter(fn($e) => $e->data->format('Y-m') === $key);
+                $chartIncasari[] = round((float)$monthEntries->where('tip', 'incasare')->sum('suma'), 2);
+                $chartPlati[]    = round((float)$monthEntries->where('tip', 'plata')->sum('suma'), 2);
+            }
+
+            $periodStart   = now()->subMonths($chartMonths - 1)->startOfMonth();
+            $platiForDonut = $entries->filter(fn($e) => $e->tip === 'plata' && $e->data >= $periodStart);
+        }
+
+        // Donut data
+        $donutLabels = [];
+        $donutValues = [];
+        foreach ($platiForDonut->groupBy('metoda') as $metoda => $group) {
+            $donutLabels[] = ucfirst($metoda);
+            $donutValues[] = round((float)$group->sum('suma'), 2);
+        }
+
+        $chartData = [
+            'labels'       => $chartLabels,
+            'incasari'     => $chartIncasari,
+            'plati'        => $chartPlati,
+            'donut_labels' => $donutLabels,
+            'donut_values' => $donutValues,
+        ];
+
+        return view('registru.index', compact('entries', 'chartData', 'chartMonths', 'chartYear', 'availableYears'));
     }
 
     public function edit($id)
