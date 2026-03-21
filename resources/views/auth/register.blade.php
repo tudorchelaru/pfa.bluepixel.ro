@@ -3,13 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Autentificare — NUVA.</title>
+<title>Cont nou — NUVA.</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="shortcut icon" href="/favicon.ico">
-<link rel="manifest" href="/manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="NUVA">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400&display=swap" rel="stylesheet">
@@ -122,6 +118,8 @@ h1 {
   box-shadow: 0 0 0 3px rgba(249,115,22,.1);
   background: var(--white);
 }
+.finput.is-invalid { border-color: #fca5a5; }
+.field-error { font-size: 12px; color: #dc2626; margin-top: 4px; }
 
 .fsubmit {
   width: 100%;
@@ -140,19 +138,19 @@ h1 {
 }
 .fsubmit:hover { background: var(--orange-d); transform: translateY(-1px); }
 
-.register-link {
+.login-link {
   text-align: center;
   margin-top: 1.25rem;
   font-size: 13px;
   font-weight: var(--w-light);
   color: var(--muted);
 }
-.register-link a {
+.login-link a {
   color: var(--orange);
   text-decoration: none;
   font-weight: var(--w-reg);
 }
-.register-link a:hover { color: var(--orange-d); }
+.login-link a:hover { color: var(--orange-d); }
 </style>
 </head>
 <body>
@@ -164,34 +162,60 @@ h1 {
     <span class="logo-tag">"Pentru profesioniști independenți."</span>
   </a>
 
-  <h1>Intră în cont</h1>
-  <p class="subtitle">Autentifică-te pentru a continua.</p>
+  <h1>Creează cont gratuit</h1>
+  <p class="subtitle">Înregistrare rapidă, fără card de credit.</p>
 
   @if ($errors->any())
     <div class="error-box">{{ $errors->first() }}</div>
   @endif
 
-  <form method="POST" action="{{ route('login.post') }}">
+  <form method="POST" action="{{ route('register.post') }}">
     @csrf
 
     <div class="fgroup">
       <label class="flabel" for="username">Username</label>
-      <input class="finput" type="text" id="username" name="username"
+      <input class="finput @error('username') is-invalid @enderror"
+             type="text" id="username" name="username"
              value="{{ old('username') }}"
              placeholder="ex: tudor" autocomplete="username" required autofocus>
+      @error('username')
+        <p class="field-error">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div class="fgroup">
+      <label class="flabel" for="email">Email</label>
+      <input class="finput @error('email') is-invalid @enderror"
+             type="email" id="email" name="email"
+             value="{{ old('email') }}"
+             placeholder="tudor@exemplu.ro" autocomplete="email" required>
+      @error('email')
+        <p class="field-error">{{ $message }}</p>
+      @enderror
     </div>
 
     <div class="fgroup">
       <label class="flabel" for="password">Parolă</label>
-      <input class="finput" type="password" id="password" name="password"
-             placeholder="••••••••" autocomplete="current-password" required>
+      <input class="finput @error('password') is-invalid @enderror"
+             type="password" id="password" name="password"
+             placeholder="Minim 8 caractere" autocomplete="new-password" required>
+      @error('password')
+        <p class="field-error">{{ $message }}</p>
+      @enderror
     </div>
 
-    <button type="submit" class="fsubmit">Intră în cont →</button>
+    <div class="fgroup">
+      <label class="flabel" for="password_confirmation">Confirmă parola</label>
+      <input class="finput"
+             type="password" id="password_confirmation" name="password_confirmation"
+             placeholder="••••••••" autocomplete="new-password" required>
+    </div>
+
+    <button type="submit" class="fsubmit">Creează cont →</button>
   </form>
 
-  <p class="register-link">
-    Nu ai cont? <a href="{{ route('register') }}">Creează unul gratuit</a>
+  <p class="login-link">
+    Ai deja cont? <a href="{{ route('login') }}">Autentifică-te</a>
   </p>
 </div>
 </body>

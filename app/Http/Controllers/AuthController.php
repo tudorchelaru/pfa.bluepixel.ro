@@ -32,11 +32,34 @@ class AuthController extends Controller
         ])->onlyInput('username');
     }
 
+    public function showRegister()
+    {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'username' => 'required|string|max:64|unique:users,username',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = \App\Models\User::create($data);
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('dashboard');
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login');
+        return redirect()->route('home');
     }
 }

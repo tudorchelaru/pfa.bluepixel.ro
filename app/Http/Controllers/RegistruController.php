@@ -11,7 +11,8 @@ class RegistruController extends Controller
     public function create()
     {
         $firma = Auth::user()->firme()->first();
-        return view('registru.create', compact('firma'));
+        $firme = Auth::user()->firme()->get();
+        return view('registru.create', compact('firma', 'firme'));
     }
 
     public function store(Request $request)

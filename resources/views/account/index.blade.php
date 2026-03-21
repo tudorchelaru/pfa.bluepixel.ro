@@ -5,16 +5,14 @@
 <div class="page-content">
     <div style="max-width:860px; margin:0 auto;">
 
-        <h2 style="color:var(--text); font-weight:700; font-size:1.6rem; margin-bottom:1.75rem;">
-            Contul meu
-        </h2>
+        <h2 class="page-title">Contul meu</h2>
 
         {{-- ── Tab nav ────────────────────────────────── --}}
         @php $tab = session('tab', 'profil'); @endphp
         <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; border-bottom:1px solid var(--border); padding-bottom:0;">
             @foreach(['profil'=>'Profil', 'parola'=>'Parolă', 'firma'=>'Datele firmei'] as $key=>$label)
             <button onclick="switchTab('{{ $key }}')" id="tab-btn-{{ $key }}"
-                style="padding:0.6rem 1.25rem; border:none; background:none; font-weight:600; font-size:0.95rem;
+                style="padding:0.6rem 1.25rem; border:none; background:none; font-family:'DM Sans',sans-serif; font-weight:300; font-size:13px; letter-spacing:.04em;
                        cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-1px;
                        color:var(--text-muted); transition:color .2s, border-color .2s;">
                 {{ $label }}
@@ -34,7 +32,7 @@
 
         {{-- ══ TAB 1 — PROFIL ════════════════════════════ --}}
         <div id="tab-profil" class="account-tab glass-card" style="margin-bottom:1.5rem;">
-            <h5 style="color:var(--text); font-weight:700; margin-bottom:1.25rem;">Date profil</h5>
+            <h5 style="color:var(--text); font-family:'DM Sans',sans-serif; font-weight:400; font-size:15px; margin-bottom:1.25rem;">Date profil</h5>
             <form method="POST" action="{{ route('account.profil') }}">
                 @csrf @method('PATCH')
                 <div class="row g-3">
@@ -57,7 +55,7 @@
 
         {{-- ══ TAB 2 — PAROLĂ ════════════════════════════ --}}
         <div id="tab-parola" class="account-tab glass-card" style="margin-bottom:1.5rem; display:none;">
-            <h5 style="color:var(--text); font-weight:700; margin-bottom:1.25rem;">Schimbă parola</h5>
+            <h5 style="color:var(--text); font-family:'DM Sans',sans-serif; font-weight:400; font-size:15px; margin-bottom:1.25rem;">Schimbă parola</h5>
             <form method="POST" action="{{ route('account.parola') }}">
                 @csrf @method('PATCH')
                 <div class="row g-3">
@@ -82,8 +80,8 @@
 
         {{-- ══ TAB 3 — FIRMA ═════════════════════════════ --}}
         <div id="tab-firma" class="account-tab glass-card" style="margin-bottom:1.5rem; display:none;">
-            <h5 style="color:var(--text); font-weight:700; margin-bottom:1.25rem;">Datele firmei</h5>
-            <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1.25rem;">
+            <h5 style="color:var(--text); font-family:'DM Sans',sans-serif; font-weight:400; font-size:15px; margin-bottom:1.25rem;">Datele firmei</h5>
+            <p style="color:var(--text-muted); font-family:'DM Sans',sans-serif; font-weight:300; font-size:13px; margin-bottom:1.25rem;">
                 Aceste date apar ca antet în PDF-ul registrului generat.
             </p>
 
