@@ -59,6 +59,20 @@
             font-weight: 700;
             color: #fff;
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .brand-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            filter: drop-shadow(0 0 6px rgba(249,212,35,0.6));
         }
 
         .nav-toggler {
@@ -536,7 +550,25 @@
 @auth
 <nav class="navbar-custom">
     <div class="navbar-top">
-        <a href="{{ route('dashboard') }}" class="brand">PFA Expenses</a>
+        <a href="{{ route('dashboard') }}" class="brand">
+            <span class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <defs>
+                        <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#f9d423"/>
+                            <stop offset="100%" style="stop-color:#ff4e50"/>
+                        </linearGradient>
+                        <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#43e97b"/>
+                            <stop offset="100%" style="stop-color:#38f9d7"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="12" r="10" fill="url(#coinGrad)"/>
+                    <text x="12" y="16.5" font-family="Arial" font-size="12" font-weight="900" text-anchor="middle" fill="rgba(255,255,255,0.95)">₣</text>
+                </svg>
+            </span>
+            PFA Expenses
+        </a>
         <button class="nav-toggler" onclick="this.classList.toggle('open');document.getElementById('navLinks').classList.toggle('open');" aria-label="Meniu">
             <span></span><span></span><span></span>
         </button>
