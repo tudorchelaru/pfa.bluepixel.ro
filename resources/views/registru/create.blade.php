@@ -11,6 +11,10 @@
             <div class="alert-success-custom">{{ session('success') }}</div>
         @endif
 
+        @if(session('error'))
+            <div class="alert-danger-custom">{{ session('error') }}</div>
+        @endif
+
         @if($errors->any())
             <div class="alert-danger-custom">{{ $errors->first() }}</div>
         @endif
@@ -143,7 +147,10 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary-custom w-100" style="text-align:center;">Adauga inregistrare</button>
+            <button type="submit" class="btn-primary-custom w-100" style="text-align:center;"
+                {{ $firme->isEmpty() ? 'disabled title="Adaugă mai întâi o firmă din Contul meu"' : '' }}>
+                Adauga inregistrare
+            </button>
         </form>
     </div>
 </div>

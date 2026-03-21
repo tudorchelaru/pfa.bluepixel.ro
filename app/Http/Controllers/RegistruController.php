@@ -16,8 +16,13 @@ class RegistruController extends Controller
 
     public function store(Request $request)
     {
+        if (Auth::user()->firme()->doesntExist()) {
+            return redirect()->route('registru.create')
+                ->with('error', 'Trebuie să adaugi cel puțin o firmă înainte de a adăuga înregistrări.');
+        }
+
         $validated = $request->validate([
-            'firma_id'       => 'nullable|exists:firme,id',
+            'firma_id'       => 'required|exists:firme,id',
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
