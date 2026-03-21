@@ -1,0 +1,121 @@
+@extends('layouts.app')
+
+@section('title', 'Adauga inregistrare - PFA Expenses')
+
+@section('content')
+<div style="max-width:700px;margin:0 auto;">
+    <div class="glass-card">
+        <h1 class="page-title" style="text-align:center;">+ Adauga inregistrare</h1>
+
+        @if(session('success'))
+            <div class="alert-success-custom">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert-danger-custom">{{ $errors->first() }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('registru.store') }}">
+            @csrf
+
+            <div class="mb-3">
+                <label class="form-label">Data</label>
+                <input type="date" class="form-control" name="data"
+                    value="{{ old('data', date('Y-m-d')) }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tip</label>
+                <div class="d-flex gap-3">
+                    <label style="cursor:pointer;display:flex;align-items:center;gap:0.5rem;">
+                        <input type="radio" name="tip" value="incasare" {{ old('tip', 'incasare') === 'incasare' ? 'checked' : '' }}>
+                        <span>Incasare</span>
+                    </label>
+                    <label style="cursor:pointer;display:flex;align-items:center;gap:0.5rem;">
+                        <input type="radio" name="tip" value="plata" {{ old('tip') === 'plata' ? 'checked' : '' }}>
+                        <span>Plata</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Metoda</label>
+                <div class="d-flex gap-3">
+                    <label style="cursor:pointer;display:flex;align-items:center;gap:0.5rem;">
+                        <input type="radio" name="metoda" value="numerar" {{ old('metoda', 'numerar') === 'numerar' ? 'checked' : '' }}>
+                        <span>Numerar</span>
+                    </label>
+                    <label style="cursor:pointer;display:flex;align-items:center;gap:0.5rem;">
+                        <input type="radio" name="metoda" value="banca" {{ old('metoda') === 'banca' ? 'checked' : '' }}>
+                        <span>Banca</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="plata_fields" style="display:none;background:rgba(102,126,234,0.15);padding:1.25rem;border-radius:14px;border:1px solid rgba(102,126,234,0.3);margin-bottom:1rem;">
+                <div class="mb-3">
+                    <label class="form-label">Tip cheltuiala</label>
+                    <select name="tip_cheltuiala" id="tip_cheltuiala" class="form-select" disabled>
+                        <option value="diverse" {{ old('tip_cheltuiala') === 'diverse' ? 'selected' : '' }}>Diverse</option>
+                        <option value="cincizeci_la_suta" {{ old('tip_cheltuiala') === 'cincizeci_la_suta' ? 'selected' : '' }}>50%</option>
+                        <option value="rata_leasing" {{ old('tip_cheltuiala') === 'rata_leasing' ? 'selected' : '' }}>Rata leasing</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Deductibilitate (%)</label>
+                    <p style="color:rgba(255,200,200,0.9);font-size:0.85rem;background:rgba(220,53,69,0.2);padding:0.5rem 0.75rem;border-radius:8px;margin-bottom:0.5rem;">
+                        Se alege 50% DOAR la ce se deduce la jumatate - in rest lasam 100%
+                    </p>
+                    <select name="deductibilitate" id="deductibilitate" class="form-select" disabled>
+                        <option value="100" {{ old('deductibilitate', '100') == '100' ? 'selected' : '' }}>100%</option>
+                        <option value="50" {{ old('deductibilitate') == '50' ? 'selected' : '' }}>50%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Document</label>
+                <input type="text" class="form-control" name="document"
+                    value="{{ old('document') }}" required placeholder="ex: Factura client X">
+            </div>
+
+            <input type="hidden" name="valuta" value="RON">
+
+            <div class="mb-3">
+                <label class="form-label">Suma (RON)</label>
+                <input type="text" class="form-control" name="suma"
+                    value="{{ old('suma') }}" required placeholder="ex: 507.60">
+            </div>
+
+            <button type="submit" class="btn-primary-custom w-100" style="text-align:center;">Adauga inregistrare</button>
+        </form>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+function togglePlataFields() {
+    const isPlata = document.querySelector('input[name="tip"][value="plata"]')?.checked;
+    const plataFields = document.getElementById('plata_fields');
+    const tipCheltuiala = document.getElementById('tip_cheltuiala');
+    const deductibilitate = document.getElementById('deductibilitate');
+
+    if (isPlata) {
+        plataFields.style.display = 'block';
+        tipCheltuiala.disabled = false;
+        deductibilitate.disabled = false;
+    } else {
+        plataFields.style.display = 'none';
+        tipCheltuiala.disabled = true;
+        deductibilitate.disabled = true;
+    }
+}
+
+document.querySelectorAll('input[name="tip"]').forEach(el => {
+    el.addEventListener('change', togglePlataFields);
+});
+
+togglePlataFields();
+</script>
+@endpush
