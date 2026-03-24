@@ -86,10 +86,27 @@ class RegistruController extends Controller
         $chartYear   = null;
         $chartMonths = null;
 
+        $currentYear = (int) now()->format('Y');
+        $requestedYearRaw = $request->get('chart_year');
+        $hasExplicitYear = is_string($requestedYearRaw) && preg_match('/^\d{4}$/', $requestedYearRaw);
+        $hasExplicitMonths = $request->has('chart_months');
+
+        // Auto-select nearest available year only on initial load (no explicit filters),
+        // and only when current year has no entries.
+        if (!$hasExplicitYear && !$hasExplicitMonths && $availableYears->isNotEmpty()) {
+            $hasCurrentYearData = $availableYears->contains((string) $currentYear) || $availableYears->contains($currentYear);
+            if (!$hasCurrentYearData) {
+                $chartYear = (int) $availableYears
+                    ->sortBy(fn($y) => abs((int) $y - $currentYear))
+                    ->first();
+            }
+        }
+
         // Mode A: specific year selected
-        $requestedYear = $request->get('chart_year');
-        if ($requestedYear && preg_match('/^\d{4}$/', $requestedYear)) {
-            $chartYear = (int) $requestedYear;
+        if ($hasExplicitYear || $chartYear !== null) {
+            if ($hasExplicitYear) {
+                $chartYear = (int) $requestedYearRaw;
+            }
 
             for ($m = 1; $m <= 12; $m++) {
                 $key = $chartYear . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
