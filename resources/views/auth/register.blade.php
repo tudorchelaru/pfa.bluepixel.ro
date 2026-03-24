@@ -173,11 +173,33 @@ h1 {
     @csrf
 
     <div class="fgroup">
+      <label class="flabel" for="first_name">Nume</label>
+      <input class="finput @error('first_name') is-invalid @enderror"
+             type="text" id="first_name" name="first_name"
+             value="{{ old('first_name') }}"
+             placeholder="ex: Popescu" autocomplete="given-name" required autofocus>
+      @error('first_name')
+        <p class="field-error">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div class="fgroup">
+      <label class="flabel" for="last_name">Prenume</label>
+      <input class="finput @error('last_name') is-invalid @enderror"
+             type="text" id="last_name" name="last_name"
+             value="{{ old('last_name') }}"
+             placeholder="ex: Tudor" autocomplete="family-name" required>
+      @error('last_name')
+        <p class="field-error">{{ $message }}</p>
+      @enderror
+    </div>
+
+    <div class="fgroup">
       <label class="flabel" for="username">Username</label>
       <input class="finput @error('username') is-invalid @enderror"
              type="text" id="username" name="username"
              value="{{ old('username') }}"
-             placeholder="ex: tudor" autocomplete="username" required autofocus>
+             placeholder="ex: tudor.popescu" autocomplete="username" required>
       @error('username')
         <p class="field-error">{{ $message }}</p>
       @enderror

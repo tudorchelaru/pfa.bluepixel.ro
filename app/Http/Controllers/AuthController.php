@@ -20,6 +20,10 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->merge([
+            'username' => strtolower(trim((string) $request->input('username'))),
+        ]);
+
         $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
@@ -77,10 +81,22 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        $request->merge([
+            'username' => strtolower(trim((string) $request->input('username'))),
+            'first_name' => trim((string) $request->input('first_name')),
+            'last_name' => trim((string) $request->input('last_name')),
+        ]);
+
         $data = $request->validate([
-            'username' => 'required|string|max:64|unique:users,username',
+            'first_name' => ['required', 'string', 'min:2', 'max:60', "regex:/^[\\p{L}\\p{M}'-]+$/u"],
+            'last_name' => ['required', 'string', 'min:2', 'max:60', "regex:/^[\\p{L}\\p{M}'-]+$/u"],
+            'username' => ['required', 'string', 'min:3', 'max:32', 'regex:/^[a-z0-9][a-z0-9._-]*$/', 'unique:users,username'],
             'email'    => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'username.regex' => 'Username-ul poate conține doar litere mici, cifre, punct, underscore și minus (fără spații).',
+            'first_name.regex' => 'Numele poate conține doar litere, apostrof și cratimă.',
+            'last_name.regex' => 'Prenumele poate conține doar litere, apostrof și cratimă.',
         ]);
 
         $isAdminUser = strtolower($data['username']) === 'tudor';

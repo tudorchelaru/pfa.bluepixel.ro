@@ -34,10 +34,23 @@ class UserManagementController extends Controller
         return back()->with('success', "Utilizatorul '{$user->username}' a fost validat.");
     }
 
+    public function destroyPending(int $id)
+    {
+        $this->authorizeAdmin();
+
+        $user = User::findOrFail($id);
+        abort_if($user->is_approved, 422, 'Poți șterge doar useri nevalidați.');
+        abort_if(strtolower($user->username) === 'tudor', 422, 'Utilizatorul admin nu poate fi șters.');
+
+        $username = $user->username;
+        $user->delete();
+
+        return back()->with('success', "Utilizatorul nevalidat '{$username}' a fost șters.");
+    }
+
     private function authorizeAdmin(): void
     {
         $user = Auth::user();
         abort_if(!$user || !$user->isAdmin(), 403);
     }
 }
-

@@ -19,6 +19,8 @@
             <table class="table table-borderless table-sm registru-table">
                 <thead>
                     <tr>
+                        <th>Nume</th>
+                        <th>Prenume</th>
                         <th>User</th>
                         <th>Email</th>
                         <th>Rol</th>
@@ -30,6 +32,8 @@
                 <tbody>
                     @foreach($users as $user)
                         <tr>
+                            <td>{{ $user->first_name ?: '-' }}</td>
+                            <td>{{ $user->last_name ?: '-' }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->email ?: '-' }}</td>
                             <td>{{ $user->role ?: 'user' }}</td>
@@ -50,6 +54,14 @@
                                             Validează
                                         </button>
                                     </form>
+                                    <form method="POST" action="{{ route('users.destroy-pending', $user->id) }}" class="d-inline ms-1"
+                                          onsubmit="return confirm('Ștergi utilizatorul nevalidat {{ $user->username }}?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-danger-custom" style="padding:0.35rem 0.75rem;font-size:12px;">
+                                            Șterge
+                                        </button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>
@@ -60,4 +72,3 @@
     @endif
 </div>
 @endsection
-
