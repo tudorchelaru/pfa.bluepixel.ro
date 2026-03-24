@@ -56,15 +56,20 @@
         }
 
         .month-header td {
-            background: #34495e !important;
-            color: #fff !important;
+            background: #dfe6ee !important;
+            color: #111 !important;
             font-weight: bold;
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 5px 8px;
-            border-color: #34495e;
+            border-color: #9aa8b7;
+            border-top: 2px solid #2c3e50;
         }
+
+        .month-header { page-break-after: avoid; }
+        .month-header + tr { page-break-before: avoid; }
+        tbody tr { page-break-inside: avoid; }
 
         .month-total td {
             background: #ecf0f1;
@@ -172,7 +177,7 @@
 
         {{-- Header luna --}}
         <tr class="month-header">
-            <td colspan="8">{{ $luniRo[$luna] }}</td>
+            <td colspan="8">LUNA {{ strtoupper($luniRo[$luna] ?? \Carbon\Carbon::create()->month((int) $luna)->locale('ro')->translatedFormat('F')) }}</td>
         </tr>
 
         @foreach($lunaEntries as $entry)
