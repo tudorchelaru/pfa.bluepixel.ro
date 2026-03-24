@@ -456,12 +456,12 @@ body {
         <label class="flabel" for="username">Username</label>
         <input class="finput" type="text" id="username" name="username"
                value="{{ old('username') }}"
-               placeholder="ex: tudor" autocomplete="username">
+               placeholder="ex: tudor" autocomplete="username" required>
       </div>
       <div class="fgroup">
         <label class="flabel" for="password">Parolă</label>
         <input class="finput" type="password" id="password" name="password"
-               placeholder="••••••••••" autocomplete="current-password">
+               placeholder="••••••••••" autocomplete="current-password" required>
       </div>
       <button type="submit" class="fsubmit">Intră în cont →</button>
     </form>

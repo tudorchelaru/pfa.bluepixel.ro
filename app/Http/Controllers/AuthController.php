@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -17,10 +19,30 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $validator = Validator::make($request->all(), [
             'username' => 'required|string',
             'password' => 'required|string',
+        ], [
+            'required' => 'Campul :attribute este obligatoriu.',
+        ], [
+            'username' => 'username',
+            'password' => 'parola',
         ]);
+
+        if ($validator->fails()) {
+            Log::warning('Login validation failed', [
+                'input_keys' => array_keys($request->all()),
+                'has_username' => $request->has('username'),
+                'has_password' => $request->has('password'),
+                'username_len' => strlen((string) $request->input('username', '')),
+                'password_len' => strlen((string) $request->input('password', '')),
+                'ip' => $request->ip(),
+            ]);
+
+            return back()->withErrors($validator)->onlyInput('username');
+        }
+
+        $credentials = $validator->validated();
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
