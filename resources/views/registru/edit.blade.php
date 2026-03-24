@@ -129,6 +129,7 @@
                         <button type="button" onclick="stergeBon()" style="margin-top:0.5rem;background:rgba(220,53,69,0.3);border:1px solid rgba(220,53,69,0.5);color:#fff;padding:0.25rem 0.75rem;border-radius:6px;cursor:pointer;font-size:0.85rem;">Anuleaza selectia</button>
                     </div>
                     <p id="bon_hint" style="color:var(--text-muted);font-size:0.82rem;margin:0;">{{ $entry->bon_imagine ? 'Incarca o poza noua sau un PDF pentru a-l inlocui.' : 'Fa o poza cu camera, incarca o imagine sau un PDF.' }}</p>
+                    <p id="ocr_status" style="display:none;color:var(--text-muted);font-size:0.8rem;margin:0.35rem 0 0;"></p>
                 </div>
             </div>
 
@@ -188,7 +189,9 @@ function previewBon(input) {
     if (!input.files || !input.files[0]) return;
     const stergeBonCb = document.querySelector('input[name="sterge_bon"]');
     if (stergeBonCb) stergeBonCb.checked = false;
-    showPreview(input.files[0]);
+    const file = input.files[0];
+    showPreview(file);
+    runOcr(file);
 }
 
 function cameraSelected(camInput) {
@@ -200,6 +203,7 @@ function cameraSelected(camInput) {
     const stergeBonCb = document.querySelector('input[name="sterge_bon"]');
     if (stergeBonCb) stergeBonCb.checked = false;
     showPreview(file);
+    runOcr(file);
 }
 
 function showPreview(file) {
@@ -225,6 +229,7 @@ function stergeBon() {
     document.getElementById('bon_preview').style.display = 'none';
     document.getElementById('bon_pdf_preview').style.display = 'none';
     document.getElementById('bon_hint').style.display = 'block';
+    setOcrStatus('', false);
 }
 
 function toggleStergeBon(cb) {
@@ -235,6 +240,70 @@ function toggleStergeBon(cb) {
     const bonExistent = document.getElementById('bon_existent');
     if (bonExistent) {
         bonExistent.style.opacity = cb.checked ? '0.3' : '1';
+    }
+}
+
+function setOcrStatus(message, show) {
+    const statusEl = document.getElementById('ocr_status');
+    if (!statusEl) return;
+    statusEl.textContent = message || '';
+    statusEl.style.display = show && message ? 'block' : 'none';
+}
+
+function applyOcrFields(fields) {
+    const suma = fields?.suma;
+    const documentText = fields?.document;
+    const data = fields?.data;
+
+    const sumaInput = document.querySelector('input[name="suma"]');
+    const documentInput = document.querySelector('input[name="document"]');
+    const dataInput = document.querySelector('input[name="data"]');
+
+    if (suma && sumaInput) {
+        sumaInput.value = String(suma).replace('.', ',');
+        sanitizeAmountInput(sumaInput);
+    }
+
+    if (documentText && documentInput && !documentInput.value.trim()) {
+        documentInput.value = documentText;
+    }
+
+    if (data && dataInput) {
+        dataInput.value = data;
+    }
+}
+
+async function runOcr(file) {
+    if (!file) return;
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    if (!csrf) return;
+
+    const formData = new FormData();
+    formData.append('bon_ocr', file);
+
+    setOcrStatus('Analizez documentul...', true);
+
+    try {
+        const response = await fetch('{{ route('registru.ocr') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf,
+                'Accept': 'application/json',
+            },
+            body: formData,
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) {
+            setOcrStatus(payload.message || 'OCR nu a reusit pe acest fisier.', true);
+            return;
+        }
+
+        applyOcrFields(payload.fields || {});
+        setOcrStatus('Campurile au fost completate automat unde s-a putut.', true);
+    } catch (e) {
+        setOcrStatus('OCR indisponibil momentan.', true);
     }
 }
 </script>

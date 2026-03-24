@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\RegistruEntry;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 
 class RegistruController extends Controller
@@ -236,6 +237,35 @@ class RegistruController extends Controller
             );
     }
 
+    public function ocr(Request $request)
+    {
+        $request->validate([
+            'bon_ocr' => 'required|file|mimes:jpeg,jpg,png,gif,webp,pdf|max:20480',
+        ]);
+
+        if (!$this->commandExists('tesseract')) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'OCR indisponibil momentan (tesseract nu este instalat pe server).',
+            ], 422);
+        }
+
+        $file = $request->file('bon_ocr');
+        $text = $this->extractOcrText($file);
+
+        if (trim($text) === '') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Nu am putut citi textul din document. Incearca o poza mai clara.',
+            ], 422);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'fields' => $this->extractFieldsFromOcrText($text),
+        ]);
+    }
+
     private function normalizeAmountInput($value): ?string
     {
         if ($value === null) {
@@ -250,6 +280,228 @@ class RegistruController extends Controller
         }
 
         return $normalized;
+    }
+
+    private function extractOcrText(UploadedFile $file): string
+    {
+        $tmpDir = sys_get_temp_dir() . '/nuva-ocr-' . bin2hex(random_bytes(8));
+        @mkdir($tmpDir, 0700, true);
+
+        try {
+            $mime = $file->getMimeType();
+            $ocrImagePath = null;
+
+            if ($mime === 'application/pdf') {
+                if ($this->commandExists('pdftoppm')) {
+                    $pdfPath = $tmpDir . '/input.pdf';
+                    copy($file->getRealPath(), $pdfPath);
+
+                    $prefix = $tmpDir . '/page';
+                    $cmd = 'pdftoppm -f 1 -singlefile -png '
+                        . escapeshellarg($pdfPath) . ' '
+                        . escapeshellarg($prefix) . ' 2>/dev/null';
+                    shell_exec($cmd);
+
+                    $candidate = $prefix . '.png';
+                    if (is_file($candidate)) {
+                        $ocrImagePath = $candidate;
+                    }
+                }
+
+                if (!$ocrImagePath) {
+                    return '';
+                }
+            } else {
+                [$jpegData] = $this->processImage($file);
+                if (!$jpegData) {
+                    return '';
+                }
+
+                $ocrImagePath = $tmpDir . '/input.jpg';
+                file_put_contents($ocrImagePath, $jpegData);
+            }
+
+            return $this->runTesseract($ocrImagePath);
+        } finally {
+            $this->cleanupTmpDir($tmpDir);
+        }
+    }
+
+    private function runTesseract(string $imagePath): string
+    {
+        $base = 'tesseract '
+            . escapeshellarg($imagePath)
+            . ' stdout -l ron+eng';
+
+        $text = (string) shell_exec($base . ' --psm 6 2>/dev/null');
+        if (trim($text) !== '') {
+            return $text;
+        }
+
+        return (string) shell_exec($base . ' --psm 11 2>/dev/null');
+    }
+
+    private function extractFieldsFromOcrText(string $text): array
+    {
+        $text = preg_replace('/\r\n?/', "\n", $text);
+        $lines = array_values(array_filter(array_map('trim', explode("\n", $text))));
+
+        return [
+            'suma' => $this->detectTotalAmount($text),
+            'document' => $this->detectDocumentText($text, $lines),
+            'data' => $this->detectDocumentDate($text),
+        ];
+    }
+
+    private function detectTotalAmount(string $text): ?string
+    {
+        $matches = [];
+        preg_match_all(
+            '/(?:total(?:\s+de\s+plata)?|de\s+plata|total\s+lei|rest\s+de\s+plata)\D{0,24}(\d[\d\.\,\s]{0,16})/iu',
+            $text,
+            $matches
+        );
+
+        $candidates = [];
+        foreach (($matches[1] ?? []) as $raw) {
+            $val = $this->parseMoney($raw);
+            if ($val !== null && $val > 0) {
+                $candidates[] = $val;
+            }
+        }
+
+        if (count($candidates) === 0) {
+            preg_match_all('/\b\d[\d\.\,\s]{0,14}\d\b/u', $text, $fallback);
+            foreach (($fallback[0] ?? []) as $raw) {
+                $val = $this->parseMoney($raw);
+                if ($val !== null && $val > 0 && $val < 100000000) {
+                    $candidates[] = $val;
+                }
+            }
+        }
+
+        if (count($candidates) === 0) {
+            return null;
+        }
+
+        $amount = max($candidates);
+        return rtrim(rtrim(number_format($amount, 2, '.', ''), '0'), '.');
+    }
+
+    private function parseMoney(string $raw): ?float
+    {
+        $val = preg_replace('/[^\d\.,]/', '', $raw ?? '');
+        if ($val === '') {
+            return null;
+        }
+
+        $lastDot = strrpos($val, '.');
+        $lastComma = strrpos($val, ',');
+        $decimalPos = max($lastDot !== false ? $lastDot : -1, $lastComma !== false ? $lastComma : -1);
+
+        if ($decimalPos >= 0) {
+            $intPart = preg_replace('/[^\d]/', '', substr($val, 0, $decimalPos));
+            $decPart = preg_replace('/[^\d]/', '', substr($val, $decimalPos + 1));
+            if ($intPart === '') {
+                $intPart = '0';
+            }
+            $normalized = $intPart . '.' . substr($decPart, 0, 2);
+        } else {
+            $normalized = preg_replace('/[^\d]/', '', $val);
+        }
+
+        if (!is_numeric($normalized)) {
+            return null;
+        }
+
+        return (float) $normalized;
+    }
+
+    private function detectDocumentText(string $text, array $lines): ?string
+    {
+        $docType = null;
+        foreach ($lines as $line) {
+            if (preg_match('/\b(factura|bon\s*fiscal|chitanta|proforma)\b/iu', $line, $m)) {
+                $docType = ucfirst(mb_strtolower($m[1]));
+                break;
+            }
+        }
+
+        $docNo = null;
+        if (preg_match('/(?:seria|serie|nr\.?|numar|no\.?)\s*[:#]?\s*([A-Z0-9\-\/]{3,})/iu', $text, $m)) {
+            $docNo = strtoupper($m[1]);
+        }
+
+        if ($docType || $docNo) {
+            $label = trim(($docType ?? 'Document') . ' ' . ($docNo ?? ''));
+            return mb_substr($label, 0, 500);
+        }
+
+        foreach ($lines as $line) {
+            if (mb_strlen($line) < 4 || mb_strlen($line) > 70) {
+                continue;
+            }
+
+            if (!preg_match('/[[:alpha:]]/u', $line)) {
+                continue;
+            }
+
+            if (preg_match('/\b(cui|cod\s+fiscal|tva|tel|str\.?|www|http)\b/iu', $line)) {
+                continue;
+            }
+
+            return mb_substr($line, 0, 500);
+        }
+
+        return null;
+    }
+
+    private function detectDocumentDate(string $text): ?string
+    {
+        if (preg_match('/\b(\d{4})-(\d{2})-(\d{2})\b/', $text, $m)) {
+            if (checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+                return $m[1] . '-' . $m[2] . '-' . $m[3];
+            }
+        }
+
+        if (preg_match('/\b(\d{2})[\.\/-](\d{2})[\.\/-](\d{4})\b/', $text, $m)) {
+            if (checkdate((int) $m[2], (int) $m[1], (int) $m[3])) {
+                return $m[3] . '-' . $m[2] . '-' . $m[1];
+            }
+        }
+
+        return null;
+    }
+
+    private function commandExists(string $command): bool
+    {
+        $result = shell_exec('command -v ' . escapeshellarg($command) . ' 2>/dev/null');
+        return trim((string) $result) !== '';
+    }
+
+    private function cleanupTmpDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = scandir($dir);
+        if ($items === false) {
+            return;
+        }
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
+
+        @rmdir($dir);
     }
 
     private function processFile($file): array

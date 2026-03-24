@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/registru/{id}', [RegistruController::class, 'update'])->name('registru.update');
     Route::delete('/registru/{id}', [RegistruController::class, 'destroy'])->name('registru.destroy');
     Route::get('/registru/{id}/bon', [RegistruController::class, 'bon'])->name('registru.bon');
+    Route::post('/registru/ocr', [RegistruController::class, 'ocr'])->name('registru.ocr');
 
     // Registre list
     Route::get('/registre', [RegistreController::class, 'index'])->name('registre.index');
