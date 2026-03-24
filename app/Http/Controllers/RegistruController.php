@@ -84,9 +84,9 @@ class RegistruController extends Controller
         $chartIncasari = [];
         $chartPlati    = [];
 
-        $chartMonths = (int) $request->get('chart_months', 6);
+        $chartMonths = (int) $request->get('chart_months', 12);
         if (!in_array($chartMonths, [3, 6, 12, 24], true)) {
-            $chartMonths = 6;
+            $chartMonths = 12;
         }
 
         $currentYear = (int) now()->format('Y');
