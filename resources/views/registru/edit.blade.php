@@ -78,9 +78,9 @@
 
             <div class="mb-3">
                 <label class="form-label">Suma ({{ $entry->valuta }})</label>
-                <input type="number" class="form-control" name="suma"
+                <input type="text" class="form-control" name="suma"
                     value="{{ old('suma', $entry->suma) }}" required
-                    inputmode="decimal" min="0.01" step="0.01" autocomplete="off">
+                    inputmode="decimal" pattern="^[0-9]+([.,][0-9]+)?$" autocomplete="off">
             </div>
 
             <div class="mb-3">
