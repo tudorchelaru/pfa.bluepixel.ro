@@ -83,59 +83,50 @@ class RegistruController extends Controller
         $chartLabels   = [];
         $chartIncasari = [];
         $chartPlati    = [];
-        $chartYear   = null;
-        $chartMonths = null;
 
-        $currentYear = (int) now()->format('Y');
-        $requestedYearRaw = $request->get('chart_year');
-        $hasExplicitYear = is_string($requestedYearRaw) && preg_match('/^\d{4}$/', $requestedYearRaw);
-        $hasExplicitMonths = $request->has('chart_months');
-
-        // Auto-select nearest available year only on initial load (no explicit filters),
-        // and only when current year has no entries.
-        if (!$hasExplicitYear && !$hasExplicitMonths && $availableYears->isNotEmpty()) {
-            $hasCurrentYearData = $availableYears->contains((string) $currentYear) || $availableYears->contains($currentYear);
-            if (!$hasCurrentYearData) {
-                $chartYear = (int) $availableYears
-                    ->sortBy(fn($y) => abs((int) $y - $currentYear))
-                    ->first();
-            }
+        $chartMonths = (int) $request->get('chart_months', 6);
+        if (!in_array($chartMonths, [3, 6, 12, 24], true)) {
+            $chartMonths = 6;
         }
 
-        // Mode A: specific year selected
-        if ($hasExplicitYear || $chartYear !== null) {
-            if ($hasExplicitYear) {
-                $chartYear = (int) $requestedYearRaw;
+        $currentYear = (int) now()->format('Y');
+        $defaultYear = null;
+        if ($availableYears->isNotEmpty()) {
+            $defaultYear = (int) $availableYears
+                ->sortBy(fn($y) => abs((int) $y - $currentYear))
+                ->first();
+        }
+
+        $requestedYearRaw = $request->get('chart_year');
+        $requestedYear = (is_string($requestedYearRaw) && preg_match('/^\d{4}$/', $requestedYearRaw))
+            ? (int) $requestedYearRaw
+            : null;
+
+        $chartYear = $requestedYear ?? $defaultYear;
+        if ($chartYear !== null && !$availableYears->contains((string) $chartYear) && !$availableYears->contains($chartYear)) {
+            $chartYear = $defaultYear;
+        }
+
+        // Always compute period relative to selected year (or nearest available default year).
+        if ($chartYear !== null) {
+            $periodEnd   = now()->setDate($chartYear, 12, 31)->endOfDay();
+            $periodStart = (clone $periodEnd)->subMonths($chartMonths - 1)->startOfMonth();
+
+            $cursor = $periodStart->copy();
+            while ($cursor <= $periodEnd) {
+                $key = $cursor->format('Y-m');
+                $chartLabels[] = $luniRo[(int) $cursor->format('n')] . " '" . $cursor->format('y');
+                $monthEntries  = $entries->filter(fn($e) => $e->data->format('Y-m') === $key);
+                $chartIncasari[] = round((float) $monthEntries->where('tip', 'incasare')->sum('suma'), 2);
+                $chartPlati[]    = round((float) $monthEntries->where('tip', 'plata')->sum('suma'), 2);
+                $cursor->addMonth();
             }
 
-            for ($m = 1; $m <= 12; $m++) {
-                $key = $chartYear . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
-                $chartLabels[]   = $luniRo[$m];
-                $monthEntries    = $entries->filter(fn($e) => $e->data->format('Y-m') === $key);
-                $chartIncasari[] = round((float)$monthEntries->where('tip', 'incasare')->sum('suma'), 2);
-                $chartPlati[]    = round((float)$monthEntries->where('tip', 'plata')->sum('suma'), 2);
-            }
-
-            $platiForDonut = $entries->filter(fn($e) => $e->tip === 'plata' && $e->data->year === $chartYear);
-
-        // Mode B: last N months
+            $platiForDonut = $entries->filter(function ($e) use ($periodStart, $periodEnd) {
+                return $e->tip === 'plata' && $e->data >= $periodStart && $e->data <= $periodEnd;
+            });
         } else {
-            $chartMonths = (int) $request->get('chart_months', 6);
-            if (!in_array($chartMonths, [3, 6, 12, 24])) {
-                $chartMonths = 6;
-            }
-
-            for ($i = $chartMonths - 1; $i >= 0; $i--) {
-                $month = now()->subMonths($i);
-                $key   = $month->format('Y-m');
-                $chartLabels[]   = $luniRo[(int)$month->format('n')] . ' \'' . $month->format('y');
-                $monthEntries    = $entries->filter(fn($e) => $e->data->format('Y-m') === $key);
-                $chartIncasari[] = round((float)$monthEntries->where('tip', 'incasare')->sum('suma'), 2);
-                $chartPlati[]    = round((float)$monthEntries->where('tip', 'plata')->sum('suma'), 2);
-            }
-
-            $periodStart   = now()->subMonths($chartMonths - 1)->startOfMonth();
-            $platiForDonut = $entries->filter(fn($e) => $e->tip === 'plata' && $e->data >= $periodStart);
+            $platiForDonut = collect();
         }
 
         // Donut data

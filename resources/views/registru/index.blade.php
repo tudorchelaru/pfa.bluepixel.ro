@@ -20,8 +20,8 @@
     <div class="chart-filter-bar">
         <span class="chart-filter-label">Perioadă:</span>
         @foreach([3 => '3 luni', 6 => '6 luni', 12 => '12 luni', 24 => '24 luni'] as $months => $label)
-            <a href="{{ route('registru.index', ['chart_months' => $months]) }}"
-               class="chart-filter-btn {{ !$chartYear && $chartMonths == $months ? 'active' : '' }}">
+            <a href="{{ route('registru.index', ['chart_months' => $months, 'chart_year' => $chartYear]) }}"
+               class="chart-filter-btn {{ $chartMonths == $months ? 'active' : '' }}">
                 {{ $label }}
             </a>
         @endforeach
@@ -30,7 +30,7 @@
     <div class="chart-filter-bar" style="margin-top:0.5rem;">
         <span class="chart-filter-label">An:</span>
         @foreach($availableYears as $yr)
-            <a href="{{ route('registru.index', ['chart_year' => $yr]) }}"
+            <a href="{{ route('registru.index', ['chart_year' => $yr, 'chart_months' => $chartMonths]) }}"
                class="chart-filter-btn {{ $chartYear == $yr ? 'active' : '' }}">
                 {{ $yr }}
             </a>
@@ -43,14 +43,14 @@
     <div class="glass-card" style="padding:1.25rem;">
         <p class="chart-title">
             Venituri vs Cheltuieli &mdash;
-            @if($chartYear) {{ $chartYear }} @else ultimele {{ $chartMonths }} luni @endif
+            @if($chartYear) {{ $chartYear }} (ultimele {{ $chartMonths }} luni) @else ultimele {{ $chartMonths }} luni @endif
         </p>
         <canvas id="barChart"></canvas>
     </div>
     <div class="glass-card" style="padding:1.25rem;">
         <p class="chart-title">
             Cheltuieli pe metodă &mdash;
-            @if($chartYear) {{ $chartYear }} @else ultimele {{ $chartMonths }} luni @endif
+            @if($chartYear) {{ $chartYear }} (ultimele {{ $chartMonths }} luni) @else ultimele {{ $chartMonths }} luni @endif
         </p>
         @if(empty($chartData['donut_values']))
             <p style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:2.5rem 0;">
