@@ -51,11 +51,13 @@
         .col-suma  { width: 11%; text-align: right; }
         .col-deduct{ width: 7%;  text-align: center; }
 
-        tr:nth-child(even) td { background: #f8f9fa; }
+        tbody tr:not(.month-header):not(.month-total):not(.grand-total):nth-child(even) td {
+            background: #f8f9fa;
+        }
 
         .month-header td {
-            background: #34495e;
-            color: #fff;
+            background: #34495e !important;
+            color: #fff !important;
             font-weight: bold;
             font-size: 9px;
             text-transform: uppercase;
