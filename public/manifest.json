@@ -1,20 +1,14 @@
 {
-    "name": "PFA Expenses",
-    "short_name": "PFA",
-    "description": "Gestiune incasari si cheltuieli PFA",
+    "name": "Nuva.ro — Evidență financiară pentru profesioniști independenți",
+    "short_name": "Nuva",
+    "description": "Evidență financiară pentru profesioniști independenți",
     "start_url": "/registru",
     "scope": "/",
     "display": "standalone",
     "orientation": "portrait",
-    "background_color": "#0f172a",
-    "theme_color": "#0f172a",
+    "background_color": "#f7f5f0",
+    "theme_color": "#f7f5f0",
     "icons": [
-        {
-            "src": "/apple-touch-icon.png",
-            "sizes": "180x180",
-            "type": "image/png",
-            "purpose": "any"
-        },
         {
             "src": "/pwa-icon-192.svg",
             "sizes": "192x192",

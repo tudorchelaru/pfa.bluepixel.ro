@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editeaza inregistrare - PFA Expenses')
+@section('title', 'Editeaza inregistrare - Nuva.ro — Evidență financiară pentru profesioniști independenți')
 
 @section('content')
 <div style="max-width:700px;margin:0 auto;">

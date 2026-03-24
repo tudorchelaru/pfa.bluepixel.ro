@@ -6,10 +6,10 @@
 <title>Autentificare — NUVA.</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260324-1">
 <link rel="shortcut icon" href="/favicon.ico?v=20260324-1">
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/manifest.json?v=20260324-2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="NUVA">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/pwa-icon-192.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400&display=swap" rel="stylesheet">

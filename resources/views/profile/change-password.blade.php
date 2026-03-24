@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Schimba parola - PFA Expenses')
+@section('title', 'Schimba parola - Nuva.ro — Evidență financiară pentru profesioniști independenți')
 
 @section('content')
 <div style="max-width:500px;margin:0 auto;">

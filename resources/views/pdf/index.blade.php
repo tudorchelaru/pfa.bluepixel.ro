@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Genereaza PDF - PFA Expenses')
+@section('title', 'Genereaza PDF - Nuva.ro — Evidență financiară pentru profesioniști independenți')
 
 @section('content')
 <h1 class="page-title">Genereaza PDF</h1>

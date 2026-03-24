@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - PFA Expenses')
+@section('title', 'Dashboard - Nuva.ro — Evidență financiară pentru profesioniști independenți')
 
 @section('content')
 <h1 class="page-title">Dashboard {{ $year }}</h1>

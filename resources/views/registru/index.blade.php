@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Registrul meu - PFA Expenses')
+@section('title', 'Registrul meu - Nuva.ro — Evidență financiară pentru profesioniști independenți')
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">

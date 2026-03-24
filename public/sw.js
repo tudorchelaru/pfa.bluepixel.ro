@@ -1,5 +1,5 @@
-// PFA Expenses — Service Worker
-const CACHE = 'pfa-v1';
+// Nuva.ro — Evidență financiară pentru profesioniști independenți — Service Worker
+const CACHE = 'nuva-v2';
 
 self.addEventListener('install', function(e) {
     self.skipWaiting();
