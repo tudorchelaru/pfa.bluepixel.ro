@@ -93,6 +93,15 @@ h1 {
   font-size: 13px;
   margin-bottom: 1rem;
 }
+.success-box {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 1rem;
+}
 
 .fgroup { margin-bottom: 1rem; }
 .flabel {
@@ -166,6 +175,10 @@ h1 {
 
   <h1>Intră în cont</h1>
   <p class="subtitle">Autentifică-te pentru a continua.</p>
+
+  @if (session('success'))
+    <div class="success-box">{{ session('success') }}</div>
+  @endif
 
   @if ($errors->any())
     <div class="error-box">{{ $errors->first() }}</div>

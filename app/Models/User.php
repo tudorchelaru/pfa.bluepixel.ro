@@ -10,7 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['username', 'email', 'password'];
+    protected $fillable = ['username', 'email', 'password', 'role', 'is_approved'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -18,7 +18,13 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'is_approved' => 'boolean',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || strtolower($this->username) === 'tudor';
     }
 
     public function registruEntries()

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -46,6 +47,18 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            $authUser = Auth::user();
+            if ($authUser && !$authUser->is_approved) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors([
+                    'username' => 'Contul tău este în așteptare. Adminul trebuie să îl valideze.',
+                ])->onlyInput('username');
+            }
+
             return redirect()->intended(route('dashboard'));
         }
 
@@ -70,11 +83,19 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = \App\Models\User::create($data);
-        Auth::login($user);
-        $request->session()->regenerate();
+        $isAdminUser = strtolower($data['username']) === 'tudor';
+        $data['role'] = $isAdminUser ? 'admin' : 'user';
+        $data['is_approved'] = $isAdminUser ? 1 : 0;
 
-        return redirect()->route('dashboard');
+        $user = User::create($data);
+
+        if ($user->is_approved) {
+            Auth::login($user);
+            $request->session()->regenerate();
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('login')->with('success', 'Cont creat cu succes. Așteaptă validarea de către admin.');
     }
 
     public function logout(Request $request)

@@ -201,6 +201,33 @@
             background: #fecaca !important;
         }
 
+        .new-user-nav-badge,
+        .new-user-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 11px;
+            letter-spacing: .04em;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.45);
+            color: #b91c1c;
+            animation: pulseNewUser 1.1s ease-in-out infinite;
+            white-space: nowrap;
+        }
+
+        .new-user-nav-badge {
+            margin-left: 0.35rem;
+            font-size: 10px;
+            padding: 0.12rem 0.45rem;
+        }
+
+        @keyframes pulseNewUser {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.04); }
+        }
+
         /* ── Page layout ──────────────────────────────────── */
         .page-content {
             padding: 1.75rem 1.5rem;
@@ -658,6 +685,11 @@
 <body>
 
 @auth
+@php
+    $currentUser = auth()->user();
+    $showUserManagement = $currentUser && ($currentUser->role === 'admin' || strtolower($currentUser->username) === 'tudor');
+    $pendingUsersCount = $showUserManagement ? \App\Models\User::where('is_approved', 0)->count() : 0;
+@endphp
 <nav class="navbar-custom">
     <div class="navbar-top">
         <a href="{{ route('dashboard') }}" class="brand">
@@ -683,6 +715,15 @@
            style="{{ request()->routeIs('account.*') ? 'color:var(--accent);' : '' }}">
             Contul meu
         </a>
+        @if($showUserManagement)
+            <a href="{{ route('users.manage') }}"
+               style="{{ request()->routeIs('users.*') ? 'color:var(--accent);' : '' }}">
+                Management users
+                @if($pendingUsersCount > 0)
+                    <span class="new-user-nav-badge">user nou</span>
+                @endif
+            </a>
+        @endif
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="btn-logout" style="cursor:pointer;border-radius:8px;padding:0.4rem 0.85rem;font-size:13px;white-space:nowrap;">

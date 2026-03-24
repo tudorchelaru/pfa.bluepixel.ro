@@ -8,6 +8,7 @@ use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegistreController;
 use App\Http\Controllers\RegistruController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -49,4 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/cont/profil', [AccountController::class, 'updateProfil'])->name('account.profil');
     Route::patch('/cont/parola', [AccountController::class, 'updateParola'])->name('account.parola');
     Route::post('/cont/firma', [AccountController::class, 'saveFirma'])->name('account.firma.save');
+
+    // User management (admin only)
+    Route::get('/management-users', [UserManagementController::class, 'index'])->name('users.manage');
+    Route::patch('/management-users/{id}/approve', [UserManagementController::class, 'approve'])->name('users.approve');
 });
