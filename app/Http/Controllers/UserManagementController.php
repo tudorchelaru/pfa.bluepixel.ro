@@ -34,6 +34,19 @@ class UserManagementController extends Controller
         return back()->with('success', "Utilizatorul '{$user->username}' a fost validat.");
     }
 
+    public function revokeApproval(int $id)
+    {
+        $this->authorizeAdmin();
+
+        $user = User::findOrFail($id);
+        abort_if(strtolower($user->username) === 'tudor', 422, 'Utilizatorul admin nu poate fi devalidat.');
+
+        $user->is_approved = false;
+        $user->save();
+
+        return back()->with('success', "Utilizatorul '{$user->username}' a fost devalidat.");
+    }
+
     public function destroyPending(int $id)
     {
         $this->authorizeAdmin();

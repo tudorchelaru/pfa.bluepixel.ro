@@ -54,5 +54,6 @@ Route::middleware('auth')->group(function () {
     // User management (admin only)
     Route::get('/management-users', [UserManagementController::class, 'index'])->name('users.manage');
     Route::patch('/management-users/{id}/approve', [UserManagementController::class, 'approve'])->name('users.approve');
+    Route::patch('/management-users/{id}/revoke', [UserManagementController::class, 'revokeApproval'])->name('users.revoke');
     Route::delete('/management-users/{id}', [UserManagementController::class, 'destroyPending'])->name('users.destroy-pending');
 });

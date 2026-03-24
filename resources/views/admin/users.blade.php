@@ -62,6 +62,15 @@
                                             Șterge
                                         </button>
                                     </form>
+                                @elseif(strtolower($user->username) !== 'tudor')
+                                    <form method="POST" action="{{ route('users.revoke', $user->id) }}" class="d-inline"
+                                          onsubmit="return confirm('Devalidezi utilizatorul {{ $user->username }}?')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn-edit-custom" style="padding:0.35rem 0.75rem;font-size:12px;">
+                                            Devalidează
+                                        </button>
+                                    </form>
                                 @endif
                             </td>
                         </tr>
