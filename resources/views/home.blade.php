@@ -210,15 +210,15 @@ body {
 
 /* PRICING */
 .pricing { padding:4.5rem 2.5rem 5.5rem;max-width:600px;margin:0 auto;text-align:center; }
-.price-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:2.5rem;text-align:left; }
-.pcard { background:var(--white);border:1px solid var(--border);border-radius:22px;padding:1.75rem;transition:all .28s; }
+.price-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:2.5rem;text-align:left;align-items:stretch; }
+.pcard { background:var(--white);border:1px solid var(--border);border-radius:22px;padding:1.75rem;transition:all .28s;display:flex;flex-direction:column; }
 .pcard:hover { transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.07); }
 .pcard.hot { border:2px solid var(--orange);background:linear-gradient(160deg,#fff,#fff7ed);position:relative; }
 .hot-pill { position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;font-family:var(--font);font-weight:var(--w-light);font-size:11px;letter-spacing:.08em;padding:4px 16px;border-radius:99px;white-space:nowrap; }
 .pname { font-family:var(--font);font-weight:var(--w-light);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-bottom:10px; }
 .pprice { font-family:var(--font);font-weight:var(--w-thin);font-size:52px;color:var(--text);letter-spacing:-2px;line-height:1; }
 .pprice sub { font-family:var(--font);font-weight:var(--w-light);font-size:14px;color:#aaa;letter-spacing:.04em; }
-.pfeats { margin-top:1.25rem;display:flex;flex-direction:column;gap:9px; }
+.pfeats { margin-top:1.25rem;display:flex;flex-direction:column;gap:9px;flex:1 1 auto; }
 .pf { font-family:var(--font);font-weight:var(--w-light);font-size:13px;letter-spacing:.02em;color:#555;display:flex;align-items:center;gap:8px; }
 .ptick { width:17px;height:17px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:#166534; }
 .pbtn { width:100%;margin-top:1.5rem;padding:12px;border-radius:12px;font-family:var(--font);font-weight:var(--w-light);font-size:14px;letter-spacing:.06em;cursor:pointer;transition:all .22s; }
