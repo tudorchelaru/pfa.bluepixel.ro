@@ -18,7 +18,7 @@ if (in_array($host, ['pfa.bluepixel.ro', 'www.pfa.bluepixel.ro'], true)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Redirecting...</title>
-    <meta http-equiv="refresh" content="2;url={$targetUrl}">
+    <meta http-equiv="refresh" content="4;url={$targetUrl}">
     <style>
         :root { color-scheme: light; }
         * { box-sizing: border-box; }
@@ -62,7 +62,7 @@ if (in_array($host, ['pfa.bluepixel.ro', 'www.pfa.bluepixel.ro'], true)) {
     <script>
         setTimeout(function () {
             window.location.replace('{$targetUrl}');
-        }, 1800);
+        }, 3800);
     </script>
 </head>
 <body>
