@@ -759,13 +759,7 @@ window.addEventListener('beforeinstallprompt', function(e) {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    var isInApp = window.navigator.standalone === true;
-    if (isIOS && !isInApp) {
-        showBanner('Apasă ⎙ Share → "Adaugă pe ecran"', false);
-    }
-});
+// iOS install hint disabled by request.
 
 // ── Loading spinner on form submit ─────────────────────
 document.addEventListener('DOMContentLoaded', function() {
