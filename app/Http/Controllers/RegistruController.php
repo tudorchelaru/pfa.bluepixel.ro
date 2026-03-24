@@ -23,11 +23,15 @@ class RegistruController extends Controller
                 ->with('error', 'Trebuie să configurezi datele firmei înainte de a adăuga înregistrări.');
         }
 
+        $request->merge([
+            'suma' => $this->normalizeAmountInput($request->input('suma')),
+        ]);
+
         $validated = $request->validate([
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
-            'suma'           => 'required|numeric|min:0.01',
+            'suma'           => ['required', 'regex:/^\d+(\.\d+)?$/', 'numeric', 'min:0.01'],
             'valuta'         => 'required|string|max:10',
             'document'       => 'required|string|max:500',
             'deductibilitate'=> 'nullable|integer|in:50,100',
@@ -150,12 +154,16 @@ class RegistruController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
+        $request->merge([
+            'suma' => $this->normalizeAmountInput($request->input('suma')),
+        ]);
+
         $validated = $request->validate([
             'firma_id'       => 'nullable|exists:firme,id',
             'data'           => 'required|date',
             'tip'            => 'required|in:incasare,plata',
             'metoda'         => 'required|in:numerar,banca',
-            'suma'           => 'required|numeric|min:0.01',
+            'suma'           => ['required', 'regex:/^\d+(\.\d+)?$/', 'numeric', 'min:0.01'],
             'valuta'         => 'required|string|max:10',
             'document'       => 'required|string|max:500',
             'deductibilitate'=> 'nullable|integer|in:50,100',
@@ -226,6 +234,22 @@ class RegistruController extends Controller
                 ? 'inline; filename="document.pdf"'
                 : 'inline; filename="bon.jpg"'
             );
+    }
+
+    private function normalizeAmountInput($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = trim((string) $value);
+        $normalized = str_replace(' ', '', $normalized);
+
+        if (preg_match('/^\d+([,.]\d+)?$/', $normalized)) {
+            return str_replace(',', '.', $normalized);
+        }
+
+        return $normalized;
     }
 
     private function processFile($file): array

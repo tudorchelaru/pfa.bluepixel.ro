@@ -79,7 +79,8 @@
             <div class="mb-3">
                 <label class="form-label">Suma ({{ $entry->valuta }})</label>
                 <input type="text" class="form-control" name="suma"
-                    value="{{ old('suma', $entry->suma) }}" required>
+                    value="{{ old('suma', $entry->suma) }}" required
+                    inputmode="decimal" pattern="^[0-9]+([.,][0-9]+)?$" autocomplete="off">
             </div>
 
             <div class="mb-3">
@@ -164,6 +165,23 @@ document.querySelectorAll('input[name="tip"]').forEach(el => {
 });
 
 togglePlataFields();
+
+function sanitizeAmountInput(input) {
+    let value = input.value.replace(/[^0-9.,]/g, '');
+
+    const sepIndex = value.search(/[.,]/);
+    if (sepIndex !== -1) {
+        value = value.slice(0, sepIndex + 1) + value.slice(sepIndex + 1).replace(/[.,]/g, '');
+    }
+
+    input.value = value;
+}
+
+const sumaInput = document.querySelector('input[name="suma"]');
+if (sumaInput) {
+    sumaInput.addEventListener('input', () => sanitizeAmountInput(sumaInput));
+    sumaInput.addEventListener('paste', () => setTimeout(() => sanitizeAmountInput(sumaInput), 0));
+}
 
 // bon_fisier are name="bon_imagine" - se trimite direct, fara copiere
 function previewBon(input) {
