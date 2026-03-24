@@ -325,7 +325,7 @@ body {
   <div class="orb orb3"></div>
   <div class="hero-grid"></div>
   <div class="hero-inner">
-    <div class="badge"><span class="live-dot"></span>Contabilitate digitală pentru PFA</div>
+    <div class="badge"><span class="live-dot"></span>Contabilitate digitală pentru profesioniști independenți</div>
     <h1>Afacerea ta,<br><em>fără bătăi de cap</em></h1>
     <p>Înregistrezi cheltuieli și încasări în 10 secunde.<br>e-Facturi, taxe calculate automat, PDF instant.</p>
     <div class="hero-ctas">
