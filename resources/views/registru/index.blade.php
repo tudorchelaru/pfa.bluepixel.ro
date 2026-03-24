@@ -211,11 +211,11 @@
 const chartData = @json($chartData);
 
 function getChartThemeColors() {
-    var isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+    var isDark = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark';
     return {
-        grid:   isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-        ticks:  isDark ? '#94a3b8' : '#64748b',
-        legend: isDark ? '#f1f5f9' : '#0f172a',
+        grid:   isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.08)',
+        ticks:  isDark ? '#cbd5e1' : '#64748b',
+        legend: isDark ? '#e2e8f0' : '#1e293b',
     };
 }
 
