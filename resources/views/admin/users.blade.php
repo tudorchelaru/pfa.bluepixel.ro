@@ -86,9 +86,11 @@
     @endif
 </div>
 {{-- Modal schimbare parolă --}}
-<div id="passwordModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
-    <div class="glass-card" style="max-width:400px;width:100%;margin:auto;padding:2rem;">
-        <h2 class="page-title" style="margin-bottom:1.25rem;font-size:1.2rem;">Schimbă parola — <span id="modalUsername"></span></h2>
+<div id="passwordModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;padding:1rem;">
+    <div class="glass-card" style="max-width:420px;width:100%;">
+        <h5 style="color:var(--text);font-family:'DM Sans',sans-serif;font-weight:400;font-size:15px;margin-bottom:1.5rem;">
+            Schimbă parola — <span id="modalUsername" style="font-weight:600;"></span>
+        </h5>
 
         @if($errors->has('parola_noua') || $errors->has('parola_noua_confirmation'))
             <div class="alert-danger-custom" style="margin-bottom:1rem;">
@@ -102,13 +104,15 @@
             @method('PATCH')
             <input type="hidden" name="_modal_user_id" id="modalUserId" value="{{ old('_modal_user_id') }}">
             <input type="hidden" name="_modal_username" id="modalUsernameInput" value="{{ old('_modal_username') }}">
-            <div style="margin-bottom:1rem;">
-                <label class="form-label-custom">Parolă nouă</label>
-                <input type="password" name="parola_noua" class="form-control-custom" required minlength="6" autocomplete="new-password">
-            </div>
-            <div style="margin-bottom:1.5rem;">
-                <label class="form-label-custom">Confirmă parola nouă</label>
-                <input type="password" name="parola_noua_confirmation" class="form-control-custom" required autocomplete="new-password">
+            <div class="row g-3" style="margin-bottom:1.25rem;">
+                <div class="col-12">
+                    <label class="form-label">Parolă nouă</label>
+                    <input type="password" name="parola_noua" class="form-control" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Confirmă parola nouă</label>
+                    <input type="password" name="parola_noua_confirmation" class="form-control" required autocomplete="new-password">
+                </div>
             </div>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn-primary-custom">Salvează</button>
