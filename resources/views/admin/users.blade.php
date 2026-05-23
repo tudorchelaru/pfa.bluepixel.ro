@@ -45,7 +45,7 @@
                                 @endif
                             </td>
                             <td>{{ optional($user->created_at)->format('d.m.Y H:i') }}</td>
-                            <td class="text-end">
+                            <td class="text-end" style="white-space:nowrap;">
                                 @if(!$user->is_approved)
                                     <form method="POST" action="{{ route('users.approve', $user->id) }}" class="d-inline">
                                         @csrf
@@ -71,6 +71,11 @@
                                             Devalidează
                                         </button>
                                     </form>
+                                    <button type="button" class="btn-primary-custom ms-1"
+                                            style="padding:0.35rem 0.75rem;font-size:12px;"
+                                            onclick="openPasswordModal({{ $user->id }}, '{{ addslashes($user->username) }}')">
+                                        Schimbă parola
+                                    </button>
                                 @endif
                             </td>
                         </tr>
@@ -80,4 +85,59 @@
         </div>
     @endif
 </div>
+{{-- Modal schimbare parolă --}}
+<div id="passwordModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+    <div class="glass-card" style="max-width:400px;width:100%;margin:auto;padding:2rem;">
+        <h2 class="page-title" style="margin-bottom:1.25rem;font-size:1.2rem;">Schimbă parola — <span id="modalUsername"></span></h2>
+
+        @if($errors->has('parola_noua') || $errors->has('parola_noua_confirmation'))
+            <div class="alert-danger-custom" style="margin-bottom:1rem;">
+                @foreach($errors->get('parola_noua') as $e)<div>{{ $e }}</div>@endforeach
+                @foreach($errors->get('parola_noua_confirmation') as $e)<div>{{ $e }}</div>@endforeach
+            </div>
+        @endif
+
+        <form method="POST" id="passwordForm" action="">
+            @csrf
+            @method('PATCH')
+            <input type="hidden" name="_modal_user_id" id="modalUserId" value="{{ old('_modal_user_id') }}">
+            <input type="hidden" name="_modal_username" id="modalUsernameInput" value="{{ old('_modal_username') }}">
+            <div style="margin-bottom:1rem;">
+                <label class="form-label-custom">Parolă nouă</label>
+                <input type="password" name="parola_noua" class="form-control-custom" required minlength="6" autocomplete="new-password">
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label class="form-label-custom">Confirmă parola nouă</label>
+                <input type="password" name="parola_noua_confirmation" class="form-control-custom" required autocomplete="new-password">
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-primary-custom">Salvează</button>
+                <button type="button" class="btn-edit-custom" onclick="closePasswordModal()">Anulează</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openPasswordModal(userId, username) {
+    document.getElementById('modalUsername').textContent = username;
+    document.getElementById('modalUserId').value = userId;
+    document.getElementById('modalUsernameInput').value = username;
+    document.getElementById('passwordForm').action = '/management-users/' + userId + '/change-password';
+    document.getElementById('passwordModal').style.display = 'flex';
+}
+function closePasswordModal() {
+    document.getElementById('passwordModal').style.display = 'none';
+}
+document.getElementById('passwordModal').addEventListener('click', function(e) {
+    if (e.target === this) closePasswordModal();
+});
+@if($errors->has('parola_noua') || $errors->has('parola_noua_confirmation'))
+(function() {
+    var uid = document.getElementById('modalUserId').value;
+    var uname = document.getElementById('modalUsernameInput').value;
+    if (uid) openPasswordModal(uid, uname);
+})();
+@endif
+</script>
 @endsection

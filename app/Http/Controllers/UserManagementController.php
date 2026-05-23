@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
@@ -59,6 +60,24 @@ class UserManagementController extends Controller
         $user->delete();
 
         return back()->with('success', "Utilizatorul nevalidat '{$username}' a fost șters.");
+    }
+
+    public function changePassword(Request $request, int $id)
+    {
+        $this->authorizeAdmin();
+
+        $user = User::findOrFail($id);
+        abort_if($user->role === 'admin', 422, 'Nu poți schimba parola unui admin.');
+
+        $request->validate([
+            'parola_noua'              => 'required|min:6|confirmed',
+            'parola_noua_confirmation' => 'required',
+        ]);
+
+        $user->password = Hash::make($request->parola_noua);
+        $user->save();
+
+        return back()->with('success', "Parola utilizatorului '{$user->username}' a fost schimbată.");
     }
 
     private function authorizeAdmin(): void

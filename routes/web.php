@@ -56,4 +56,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/management-users/{id}/approve', [UserManagementController::class, 'approve'])->name('users.approve');
     Route::patch('/management-users/{id}/revoke', [UserManagementController::class, 'revokeApproval'])->name('users.revoke');
     Route::delete('/management-users/{id}', [UserManagementController::class, 'destroyPending'])->name('users.destroy-pending');
+    Route::patch('/management-users/{id}/change-password', [UserManagementController::class, 'changePassword'])->name('users.change-password');
 });
