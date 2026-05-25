@@ -35,8 +35,8 @@
 
             <div class="mb-3">
                 <label class="form-label">Data</label>
-                <input type="date" class="form-control" name="data"
-                    value="{{ old('data', date('Y-m-d')) }}" required>
+                <input type="text" id="data_input" class="form-control" name="data"
+                    value="{{ old('data', date('Y-m-d')) }}" required placeholder="zz/ll/aaaa" autocomplete="off">
             </div>
 
             <div class="mb-3">
@@ -143,8 +143,66 @@
 </div>
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+.flatpickr-day.selected,.flatpickr-day.selected:hover,.flatpickr-day.selected:focus{background:#f97316;border-color:#f97316;}
+.flatpickr-day.today{border-color:#f97316;color:#f97316;}
+.flatpickr-day:hover{background:rgba(249,115,22,.1);}
+.flatpickr-months .flatpickr-prev-month:hover svg,.flatpickr-months .flatpickr-next-month:hover svg{fill:#f97316;}
+</style>
+@endpush
+
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+var dataPickr = flatpickr('#data_input', {
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'd/m/Y',
+    altInputClass: 'form-control',
+    allowInput: true,
+    disableMobile: true,
+    locale: { firstDayOfWeek: 1 }
+});
+
+dataPickr.altInput.placeholder = 'zz/ll/aaaa';
+
+(function() {
+    var ai = dataPickr.altInput;
+
+    function applyMask(input) {
+        var cursorPos = input.selectionStart;
+        var raw = input.value;
+        var digits = raw.replace(/\D/g, '').slice(0, 8);
+        var fmt = '';
+        for (var i = 0; i < digits.length; i++) {
+            if (i === 2 || i === 4) fmt += '/';
+            fmt += digits[i];
+        }
+        input.value = fmt;
+        var digitsBeforeCursor = raw.slice(0, cursorPos).replace(/\D/g, '').length;
+        var dc = 0, newPos = fmt.length;
+        for (var j = 0; j <= fmt.length; j++) {
+            if (dc === digitsBeforeCursor) { newPos = j; break; }
+            if (j < fmt.length && fmt[j] !== '/') dc++;
+        }
+        input.setSelectionRange(newPos, newPos);
+        if (fmt.length === 10) {
+            var p = fmt.split('/');
+            dataPickr.setDate(p[2] + '-' + p[1] + '-' + p[0], false);
+        }
+    }
+
+    ai.addEventListener('input', function() { applyMask(this); });
+
+    ai.addEventListener('paste', function(e) {
+        e.preventDefault();
+        this.value = (e.clipboardData || window.clipboardData).getData('text');
+        applyMask(this);
+    });
+})();
+
 function togglePlataFields() {
     const isPlata = document.querySelector('input[name="tip"][value="plata"]')?.checked;
     const plataFields = document.getElementById('plata_fields');
@@ -257,8 +315,8 @@ function applyOcrFields(fields) {
         documentInput.value = documentText;
     }
 
-    if (data && dataInput) {
-        dataInput.value = data;
+    if (data && dataPickr) {
+        dataPickr.setDate(data);
     }
 }
 
