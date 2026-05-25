@@ -86,7 +86,7 @@
 
         @php
             $luniRo  = ['','Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
-            $grouped = $entries->groupBy(fn($e) => $e->data->format('Y-m'));
+            $grouped = $sumarEntries->groupBy(fn($e) => $e->data->format('Y-m'));
         @endphp
 
         @foreach($grouped as $luna => $lunaEntries)
