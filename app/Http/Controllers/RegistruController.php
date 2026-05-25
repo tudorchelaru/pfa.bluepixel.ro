@@ -107,6 +107,9 @@ class RegistruController extends Controller
             $chartYear = $defaultYear;
         }
 
+        $periodStart = null;
+        $periodEnd   = null;
+
         // Always compute period relative to selected year (or nearest available default year).
         if ($chartYear !== null) {
             $periodEnd   = now()->setDate($chartYear, 12, 31)->endOfDay();
@@ -145,7 +148,7 @@ class RegistruController extends Controller
             'donut_values' => $donutValues,
         ];
 
-        return view('registru.index', compact('entries', 'chartData', 'chartMonths', 'chartYear', 'availableYears'));
+        return view('registru.index', compact('entries', 'chartData', 'chartMonths', 'chartYear', 'availableYears', 'periodStart', 'periodEnd'));
     }
 
     public function edit($id)

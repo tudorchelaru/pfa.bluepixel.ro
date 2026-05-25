@@ -71,8 +71,11 @@
         <p style="color:var(--text-muted);text-align:center;padding:2rem;">Nu exista inregistrari.</p>
     @else
         @php
-            $totalIncasari = $entries->where('tip', 'incasare')->sum('suma');
-            $totalPlati    = $entries->where('tip', 'plata')->sum('suma');
+            $sumarEntries  = ($periodStart && $periodEnd)
+                ? $entries->filter(fn($e) => $e->data >= $periodStart && $e->data <= $periodEnd)
+                : $entries;
+            $totalIncasari = $sumarEntries->where('tip', 'incasare')->sum('suma');
+            $totalPlati    = $sumarEntries->where('tip', 'plata')->sum('suma');
             $sold          = $totalIncasari - $totalPlati;
         @endphp
         <div class="sumar-row mb-3">
