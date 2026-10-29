@@ -5,7 +5,10 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h1 class="page-title" style="margin-bottom:0;">Registrul meu</h1>
-    <a href="{{ route('registru.create') }}" class="btn-primary-custom">+ Adauga</a>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ route('registru.export') }}" class="btn-primary-custom" title="Exportă toate înregistrările, din toți anii, în format CSV">⬇ Export CSV</a>
+        <a href="{{ route('registru.create') }}" class="btn-primary-custom">+ Adauga</a>
+    </div>
 </div>
 
 @if(session('success'))

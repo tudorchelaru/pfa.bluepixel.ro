@@ -66,6 +66,54 @@ class RegistruController extends Controller
             ->with('success', 'Inregistrare adaugata cu succes!');
     }
 
+    public function exportCsv()
+    {
+        $user = Auth::user();
+
+        $entries = RegistruEntry::with('firma')
+            ->where('user_id', $user->id)
+            ->orderBy('data', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $filename = 'nuva_export_' . ($user->username ?? $user->id) . '_' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($entries) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 pentru Excel
+
+            fputcsv($out, [
+                'id', 'data', 'an', 'tip', 'metoda', 'suma', 'valuta', 'document',
+                'deductibilitate', 'tip_cheltuiala', 'are_document_atasat',
+                'firma_nume', 'firma_cui', 'firma_nr_reg_com',
+                'creat_la', 'actualizat_la',
+            ]);
+
+            foreach ($entries as $e) {
+                fputcsv($out, [
+                    $e->id,
+                    $e->data?->format('Y-m-d'),
+                    $e->data?->format('Y'),
+                    $e->tip,
+                    $e->metoda,
+                    $e->suma,
+                    $e->valuta,
+                    $e->document,
+                    $e->deductibilitate,
+                    $e->tip_cheltuiala,
+                    $e->bon_mime ? 'da' : 'nu',
+                    $e->firma?->nume,
+                    $e->firma?->cui,
+                    $e->firma?->nr_reg_com,
+                    $e->created_at?->format('Y-m-d H:i:s'),
+                    $e->updated_at?->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
     public function index(\Illuminate\Http\Request $request)
     {
         $entries = RegistruEntry::where('user_id', Auth::id())
