@@ -66,52 +66,121 @@ class RegistruController extends Controller
             ->with('success', 'Inregistrare adaugata cu succes!');
     }
 
+    private const EXPORT_COLUMNS = [
+        'id', 'user_id', 'firma_id', 'data', 'tip', 'metoda', 'suma', 'valuta', 'document',
+        'deductibilitate', 'tip_cheltuiala', 'bon_mime', 'created_at', 'updated_at',
+    ];
+
     public function exportCsv()
     {
-        $user = Auth::user();
+        $user    = Auth::user();
+        $entries = $this->exportEntries();
 
-        $entries = RegistruEntry::with('firma')
-            ->where('user_id', $user->id)
-            ->orderBy('data', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        $filename = 'nuva_export_' . ($user->username ?? $user->id) . '_' . now()->format('Y-m-d') . '.csv';
+        $filename = $this->exportFilename($user, 'csv');
 
         return response()->streamDownload(function () use ($entries) {
             $out = fopen('php://output', 'w');
-            fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 pentru Excel
-
-            fputcsv($out, [
-                'id', 'data', 'an', 'tip', 'metoda', 'suma', 'valuta', 'document',
-                'deductibilitate', 'tip_cheltuiala', 'are_document_atasat',
-                'firma_nume', 'firma_cui', 'firma_nr_reg_com',
-                'creat_la', 'actualizat_la',
-            ]);
-
-            foreach ($entries as $e) {
-                fputcsv($out, [
-                    $e->id,
-                    $e->data?->format('Y-m-d'),
-                    $e->data?->format('Y'),
-                    $e->tip,
-                    $e->metoda,
-                    $e->suma,
-                    $e->valuta,
-                    $e->document,
-                    $e->deductibilitate,
-                    $e->tip_cheltuiala,
-                    $e->bon_mime ? 'da' : 'nu',
-                    $e->firma?->nume,
-                    $e->firma?->cui,
-                    $e->firma?->nr_reg_com,
-                    $e->created_at?->format('Y-m-d H:i:s'),
-                    $e->updated_at?->format('Y-m-d H:i:s'),
-                ]);
-            }
-
+            $this->writeExportCsv($out, $entries);
             fclose($out);
         }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    public function exportZip()
+    {
+        $user    = Auth::user();
+        $entries = $this->exportEntries();
+
+        $zipPath = tempnam(sys_get_temp_dir(), 'nuva_export_');
+        $zip     = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::OVERWRITE) !== true) {
+            abort(500, 'Nu s-a putut crea arhiva ZIP.');
+        }
+
+        // Bonurile se incarca pe rand, ca sa nu tinem toate blob-urile in memorie
+        foreach ($entries as $e) {
+            if (!$e->bon_mime) {
+                continue;
+            }
+            $blob = RegistruEntry::whereKey($e->id)->value('bon_imagine');
+            if ($blob) {
+                $zip->addFromString($this->bonFilename($e), $blob);
+            }
+        }
+
+        $csv = fopen('php://temp', 'w+');
+        $this->writeExportCsv($csv, $entries);
+        rewind($csv);
+        $zip->addFromString('registru.csv', stream_get_contents($csv));
+        fclose($csv);
+
+        $zip->close();
+
+        return response()->download($zipPath, $this->exportFilename($user, 'zip'), [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
+    }
+
+    private function exportEntries()
+    {
+        return RegistruEntry::with('firma')
+            ->select(self::EXPORT_COLUMNS)
+            ->where('user_id', Auth::id())
+            ->orderBy('data', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+    }
+
+    private function exportFilename($user, string $ext): string
+    {
+        return 'nuva_export_' . ($user->username ?? $user->id) . '_' . now()->format('Y-m-d') . '.' . $ext;
+    }
+
+    private function bonFilename(RegistruEntry $e): string
+    {
+        $ext = match ($e->bon_mime) {
+            'application/pdf' => 'pdf',
+            'image/png'       => 'png',
+            'image/gif'       => 'gif',
+            'image/webp'      => 'webp',
+            default           => 'jpg',
+        };
+
+        return 'bonuri/' . $e->data->format('Y-m-d') . '_' . $e->id . '.' . $ext;
+    }
+
+    private function writeExportCsv($out, $entries): void
+    {
+        fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 pentru Excel
+
+        fputcsv($out, [
+            'id', 'data', 'an', 'tip', 'metoda', 'suma', 'valuta', 'document',
+            'deductibilitate', 'tip_cheltuiala', 'are_document_atasat', 'fisier_atasat', 'fisier_mime',
+            'firma_nume', 'firma_cui', 'firma_nr_reg_com',
+            'creat_la', 'actualizat_la',
+        ], ',', '"', '');
+
+        foreach ($entries as $e) {
+            fputcsv($out, [
+                $e->id,
+                $e->data?->format('Y-m-d'),
+                $e->data?->format('Y'),
+                $e->tip,
+                $e->metoda,
+                $e->suma,
+                $e->valuta,
+                $e->document,
+                $e->deductibilitate,
+                $e->tip_cheltuiala,
+                $e->bon_mime ? 'da' : 'nu',
+                $e->bon_mime ? $this->bonFilename($e) : null,
+                $e->bon_mime,
+                $e->firma?->nume,
+                $e->firma?->cui,
+                $e->firma?->nr_reg_com,
+                $e->created_at?->format('Y-m-d H:i:s'),
+                $e->updated_at?->format('Y-m-d H:i:s'),
+            ], ',', '"', '');
+        }
     }
 
     public function index(\Illuminate\Http\Request $request)

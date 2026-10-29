@@ -7,6 +7,7 @@
     <h1 class="page-title" style="margin-bottom:0;">Registrul meu</h1>
     <div class="d-flex gap-2 flex-wrap">
         <a href="{{ route('registru.export') }}" class="btn-primary-custom" title="Exportă toate înregistrările, din toți anii, în format CSV">⬇ Export CSV</a>
+        <a href="{{ route('registru.export.zip') }}" class="btn-primary-custom" title="Exportă CSV-ul plus toate bonurile atașate, într-o arhivă ZIP">⬇ Export ZIP (cu bonuri)</a>
         <a href="{{ route('registru.create') }}" class="btn-primary-custom">+ Adauga</a>
     </div>
 </div>

@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/registru/{id}', [RegistruController::class, 'update'])->name('registru.update');
     Route::delete('/registru/{id}', [RegistruController::class, 'destroy'])->name('registru.destroy');
     Route::get('/registru/export-csv', [RegistruController::class, 'exportCsv'])->name('registru.export');
+    Route::get('/registru/export-zip', [RegistruController::class, 'exportZip'])->name('registru.export.zip');
     Route::get('/registru/{id}/bon', [RegistruController::class, 'bon'])->name('registru.bon');
 
     // Registre list
